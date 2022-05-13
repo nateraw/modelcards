@@ -36,8 +36,6 @@ card.push_to_hub("nateraw/rare-puppers")
 
 Make model cards from the [default model card template](https://github.com/nateraw/modelcards/blob/main/modelcards/modelcard_template.md).
 
-👀 You can see what the resulting model card here looks like at [this Hugging Face Hub repo](https://huggingface.co/nateraw/my-cool-model-with-card).
-
 ```python
 from modelcards import ModelCard
 
@@ -54,13 +52,9 @@ card = ModelCard.from_template(
     model_id=repo_id.split('/')[-1],  # Included in the template
     model_description="Some really helpful description...",  # Included in the template
 )
-
-# Prints the content of the model card
-print(card)
-
-# Pushes the model card to the hub at the given repo id
-card.push_to_hub(repo_id)
 ```
+
+👀 You can see what the resulting model card here looks like at [this Hugging Face Hub repo](https://huggingface.co/nateraw/my-cool-model-with-card).
 
 Note: you can make your own template and supply that to the `from_template` method by using the `template_path` argument.
 
