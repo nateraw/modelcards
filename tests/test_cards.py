@@ -1,15 +1,24 @@
-import pytest
-from pathlib import Path
-from modelcards import ModelCard, RepoCard
-
 import tempfile
+from pathlib import Path
+
+import pytest
+
+from modelcards import ModelCard, RepoCard
 
 
 def test_load_repocard_from_file():
     sample_path = Path(__file__).parent / 'samples' / "sample_1.md"
     card = RepoCard.load(sample_path)
-    assert card.data == {'language': ['en'], 'license': 'mit', 'library_name': 'pytorch-lightning', 'tags': ['pytorch', 'image-classification'], 'dataset': ['beans'], 'metrics': ['acc']}
+    assert card.data == {
+        'language': ['en'],
+        'license': 'mit',
+        'library_name': 'pytorch-lightning',
+        'tags': ['pytorch', 'image-classification'],
+        'dataset': ['beans'],
+        'metrics': ['acc'],
+    }
     assert card.text.strip().startswith("# my-cool-model"), "Card text not loaded properly"
+
 
 def test_change_repocard_data():
     sample_path = Path(__file__).parent / 'samples' / "sample_1.md"
@@ -22,6 +31,7 @@ def test_change_repocard_data():
 
         updated_card = RepoCard.load(updated_card_path)
         assert updated_card.data['language'] == ['fr'], "Card data not updated properly"
+
 
 def test_model_card_from_default_template():
 
@@ -37,6 +47,7 @@ def test_model_card_from_default_template():
     assert card.data['language'] == ['en'], "Set language card data should be list not string"
     assert card.text.strip().startswith("# MyModelName"), "Default model name not set correctly"
 
+
 def test_model_card_from_default_template_with_model_id():
     card = ModelCard.from_template(
         language='en',
@@ -48,6 +59,7 @@ def test_model_card_from_default_template_with_model_id():
         model_id="my-cool-model",
     )
     assert card.text.strip().startswith("# my-cool-model"), "model_id not properly set in card template"
+
 
 def test_model_card_from_custom_template():
     template_path = Path(__file__).parent / 'samples' / "sample_template.md"
