@@ -1,0 +1,43 @@
+name: CI testing
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pytest:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04]  # macOS-10.15, windows-2019
+        python-version: [3.7, 3.9]  # 3.8
+        requires: ['latest']  # 'minimal', 
+
+    # Timeout: https://stackoverflow.com/a/59076067/4521646
+    timeout-minutes: 35
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install --requirement requirements.txt --upgrade --quiet --use-feature=2020-resolver
+        pip install pytest
+        python --version
+        pip --version
+        pip list
+      shell: bash
+
+    - name: Tests
+      run: |
+        python -m pytest -v tests/
