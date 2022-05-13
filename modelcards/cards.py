@@ -8,7 +8,7 @@ import yaml
 from huggingface_hub import hf_hub_download, upload_file
 
 TEMPLATE_MODELCARD_PATH = Path(__file__).parent / "modelcard_template.md"
-REGEX_YAML_BLOCK = re.compile(r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]")
+REGEX_YAML_BLOCK = re.compile(r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL)
 
 
 class RepoCard:
@@ -17,6 +17,7 @@ class RepoCard:
         match = REGEX_YAML_BLOCK.search(content)
         if match:
             yaml_block = match.group(1)
+            self.text = match.group(2)
             self.data = yaml.safe_load(yaml_block)
             if not isinstance(self.data, dict):
                 raise ValueError("repo card metadata block should be a dict")
@@ -24,7 +25,7 @@ class RepoCard:
             raise ValueError("could not find yaml block in repo card")
 
     def __str__(self):
-        return self.content
+        return f"---\n{yaml.dump(self.data, sort_keys=False)}\n---\n{self.text}"
 
     def save(self, filepath: Union[Path, str]):
         filepath = Path(filepath)
