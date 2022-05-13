@@ -1,0 +1,3 @@
+huggingface_hub
+Jinja2
+pyyaml>=5.1
