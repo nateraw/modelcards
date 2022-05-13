@@ -5,7 +5,7 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name="modelcards",
-    version='0.0.1',
+    version='0.0.2',
     author="Nathan Raw",
     author_email="naterawdata@gmail.com",
     description="📝 Utility to create, edit, and publish model cards on the Hugging Face Hub.",
