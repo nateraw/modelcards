@@ -6,7 +6,7 @@ library_name: pytorch-lightning
 tags:
 - pytorch
 - image-classification
-dataset:
+datasets:
 - beans
 metrics:
 - acc
