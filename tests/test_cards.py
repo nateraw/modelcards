@@ -7,7 +7,7 @@ from modelcards import ModelCard, RepoCard
 
 
 def test_load_repocard_from_file():
-    sample_path = Path(__file__).parent / 'samples' / "sample_1.md"
+    sample_path = Path(__file__).parent / 'samples' / "sample_simple.md"
     card = RepoCard.load(sample_path)
     assert card.data.to_dict() == {
         'language': ['en'],
@@ -21,7 +21,7 @@ def test_load_repocard_from_file():
 
 
 def test_change_repocard_data():
-    sample_path = Path(__file__).parent / 'samples' / "sample_1.md"
+    sample_path = Path(__file__).parent / 'samples' / "sample_simple.md"
     card = RepoCard.load(sample_path)
     card.data.language = ['fr']
 
@@ -74,3 +74,9 @@ def test_model_card_from_custom_template():
     )
 
     assert card.text.endswith('asdf'), "Custom template didn't set jinja variable correctly"
+
+
+def test_model_card_data_must_be_dict():
+    sample_path = Path(__file__).parent / 'samples' / "sample_invalid_card_data.md"
+    with pytest.raises(ValueError, match="repo card metadata block should be a dict"):
+        ModelCard.load(sample_path)
