@@ -86,6 +86,8 @@ class CardData:
 
     def __post_init__(self):
         if self.eval_results:
+            if type(self.eval_results) == EvalResult:
+                self.eval_results = [self.eval_results]
             if self.model_name is None:
                 raise ValueError('`eval_results` requires `model_name` to be set.')
 

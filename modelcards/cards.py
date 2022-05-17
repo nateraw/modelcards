@@ -77,9 +77,6 @@ class ModelCard(RepoCard):
         **template_kwargs,
     ):
 
-        if type(eval_results) == EvalResult:
-            eval_results = [eval_results]
-
         card_data = CardData(
             language=language,
             license=license,
