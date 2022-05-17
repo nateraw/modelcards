@@ -21,7 +21,7 @@ Load a model card from a Hugging Face Hub repo:
 ```python
 from modelcards import ModelCard
 
-card = ModelCard.load("nateraw/rare-puppers")
+card = ModelCard.load("nateraw/food")
 
 # Access its card data
 print(card.data)
@@ -33,7 +33,7 @@ card.data["library_name"] = "timm"
 card.save("my_card.md")
 
 # Or, push it to the hub directly to replace the existing card
-card.push_to_hub("nateraw/rare-puppers")
+card.push_to_hub("nateraw/food")
 ```
 
 Make model cards from the [default model card template](https://github.com/nateraw/modelcards/blob/main/modelcards/modelcard_template.md).
@@ -59,8 +59,3 @@ card = ModelCard.from_template(
 👀 You can see what the resulting model card here looks like at [this Hugging Face Hub repo](https://huggingface.co/nateraw/my-cool-model-with-card).
 
 Note: you can make your own template and supply that to the `from_template` method by using the `template_path` argument.
-
-## TODOs
-
-- [ ] Support evaluation metrics
-- [ ] Data validation on card data
