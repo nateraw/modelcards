@@ -89,14 +89,16 @@ class CardData:
             if type(self.eval_results) == EvalResult:
                 self.eval_results = [self.eval_results]
             if self.model_name is None:
-                raise ValueError('`eval_results` requires `model_name` to be set.')
+                raise ValueError("`eval_results` requires `model_name` to be set.")
 
     def to_dict(self):
 
         data_dict = asdict(self)
         if self.eval_results is not None:
-            data_dict['model-index'] = eval_results_to_model_index(self.model_name, self.eval_results)
-            del data_dict['eval_results'], data_dict['model_name']
+            data_dict["model-index"] = eval_results_to_model_index(
+                self.model_name, self.eval_results
+            )
+            del data_dict["eval_results"], data_dict["model_name"]
 
         return _remove_none(data_dict)
 
@@ -108,24 +110,24 @@ def model_index_to_eval_results(model_index):
     """Takes in a model index and returns a list of `modelcards.EvalResult` objects."""
     eval_results = []
     for elem in model_index:
-        name = elem['name']
-        results = elem['results']
+        name = elem["name"]
+        results = elem["results"]
         for result in results:
-            task_type = result['task']['type']
-            task_name = result['task'].get('name')
-            dataset_type = result['dataset']['type']
-            dataset_name = result['dataset']['name']
-            dataset_config = result['dataset'].get('config')
-            dataset_split = result['dataset'].get('split')
-            dataset_revision = result['dataset'].get('revision')
-            dataset_args = result['dataset'].get('args')
+            task_type = result["task"]["type"]
+            task_name = result["task"].get("name")
+            dataset_type = result["dataset"]["type"]
+            dataset_name = result["dataset"]["name"]
+            dataset_config = result["dataset"].get("config")
+            dataset_split = result["dataset"].get("split")
+            dataset_revision = result["dataset"].get("revision")
+            dataset_args = result["dataset"].get("args")
 
-            for metric in result['metrics']:
-                metric_type = metric['type']
-                metric_value = metric['value']
-                metric_name = metric.get('name')
-                metric_args = metric.get('args')
-                verified = metric.get('verified')
+            for metric in result["metrics"]:
+                metric_type = metric["type"]
+                metric_value = metric["value"]
+                metric_name = metric.get("name")
+                metric_args = metric.get("args")
+                verified = metric.get("verified")
 
                 eval_result = EvalResult(
                     task_type=task_type,  # Required
@@ -151,7 +153,11 @@ def _remove_none(obj):
     if isinstance(obj, (list, tuple, set)):
         return type(obj)(_remove_none(x) for x in obj if x is not None)
     elif isinstance(obj, dict):
-        return type(obj)((_remove_none(k), _remove_none(v)) for k, v in obj.items() if k is not None and v is not None)
+        return type(obj)(
+            (_remove_none(k), _remove_none(v))
+            for k, v in obj.items()
+            if k is not None and v is not None
+        )
     else:
         return obj
 
@@ -169,25 +175,25 @@ def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult])
     model_index_data = []
     for (task_type, dataset_type), results in task_and_ds_types_map.items():
         data = {
-            'task': {
-                'type': task_type,
-                'name': results[0].task_name,
+            "task": {
+                "type": task_type,
+                "name": results[0].task_name,
             },
-            'dataset': {
-                'type': dataset_type,
-                'name': results[0].dataset_name,
-                'config': results[0].dataset_config,
-                'split': results[0].dataset_split,
-                'revision': results[0].dataset_revision,
-                'args': results[0].dataset_args,
+            "dataset": {
+                "type": dataset_type,
+                "name": results[0].dataset_name,
+                "config": results[0].dataset_config,
+                "split": results[0].dataset_split,
+                "revision": results[0].dataset_revision,
+                "args": results[0].dataset_args,
             },
-            'metrics': [
+            "metrics": [
                 {
-                    'name': result.metric_name,
-                    'type': result.metric_type,
-                    'value': result.metric_value,
-                    'args': result.metric_args,
-                    'verified': result.verified,
+                    "name": result.metric_name,
+                    "type": result.metric_type,
+                    "value": result.metric_value,
+                    "args": result.metric_args,
+                    "verified": result.verified,
                 }
                 for result in results
             ],
@@ -196,8 +202,8 @@ def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult])
 
     model_index = [
         {
-            'name': model_name,
-            'results': model_index_data,
+            "name": model_name,
+            "results": model_index_data,
         }
     ]
     return _remove_none(model_index)

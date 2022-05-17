@@ -5,10 +5,12 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name="modelcards",
-    version='0.0.3',
+    version="0.0.3",
     author="Nathan Raw",
     author_email="naterawdata@gmail.com",
-    description="📝 Utility to create, edit, and publish model cards on the Hugging Face Hub.",
+    description=(
+        "📝 Utility to create, edit, and publish model cards on the Hugging Face Hub."
+    ),
     license="MIT",
     install_requires=requirements,
     packages=find_packages(),

@@ -10,7 +10,9 @@ from huggingface_hub import hf_hub_download, upload_file
 from .card_data import CardData, EvalResult, model_index_to_eval_results
 
 TEMPLATE_MODELCARD_PATH = Path(__file__).parent / "modelcard_template.md"
-REGEX_YAML_BLOCK = re.compile(r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL)
+REGEX_YAML_BLOCK = re.compile(
+    r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL
+)
 
 
 class RepoCard:
@@ -26,9 +28,12 @@ class RepoCard:
         else:
             raise ValueError("could not find yaml block in repo card")
 
-        model_index = data_dict.pop('model-index', None)
+        model_index = data_dict.pop("model-index", None)
         if model_index:
-            data_dict['model_name'], data_dict['eval_results'] = model_index_to_eval_results(model_index)
+            (
+                data_dict["model_name"],
+                data_dict["eval_results"],
+            ) = model_index_to_eval_results(model_index)
         self.data = CardData(**data_dict)
 
     def __str__(self):
@@ -54,7 +59,7 @@ class RepoCard:
             tmp_path.write_text(str(self))
             upload_file(
                 path_or_fileobj=str(tmp_path),
-                path_in_repo='README.md',
+                path_in_repo="README.md",
                 repo_id=repo_id,
                 repo_type=repo_type,
                 identical_ok=True,
