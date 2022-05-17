@@ -73,7 +73,20 @@ class EvalResult:
 
 @dataclass
 class CardData:
-    """Model Card Metadata that is used by Hugging Face Hub when included at the top of your README.md"""
+    """Model Card Metadata that is used by Hugging Face Hub when included at the top of your README.md
+
+    Example:
+        >>> from modelcards.card_data import CardData
+        >>> card_data = CardData(
+        ...     language="en",
+        ...     license="mit",
+        ...     library_name="timm",
+        ...     tags=['image-classification', 'resnet'],
+        ... )
+        >>> card_data.to_dict()
+        {'language': 'en', 'license': 'mit', 'library_name': 'timm', 'tags': ['image-classification', 'resnet']}
+
+    """
 
     language: Optional[Union[str, List[str]]] = None
     license: Optional[str] = None
@@ -92,6 +105,13 @@ class CardData:
                 raise ValueError("`eval_results` requires `model_name` to be set.")
 
     def to_dict(self):
+        """Converts CardData to a dict. It also formats the internal eval_results to
+        be compatible with the model-index format.
+
+        Returns:
+            dict: CardData represented as a dictionary ready to be dumped to a YAML
+            block for inclusion in a README.md file.
+        """
 
         data_dict = asdict(self)
         if self.eval_results is not None:
@@ -103,11 +123,63 @@ class CardData:
         return _remove_none(data_dict)
 
     def to_yaml(self):
+        """Dumps CardData to a YAML block for inclusion in a README.md file."""
         return yaml.dump(self.to_dict(), sort_keys=False).strip()
 
 
-def model_index_to_eval_results(model_index):
-    """Takes in a model index and returns a list of `modelcards.EvalResult` objects."""
+def model_index_to_eval_results(model_index: List[Dict[str, Any]]):
+    """Takes in a model index and returns a list of `modelcards.EvalResult` objects.
+
+    A detailed spec of the model index can be found here:
+    https://github.com/huggingface/hub-docs/blob/main/modelcard.md
+
+    Args:
+        model_index (List[Dict[str, Any]]):
+        A model index data structure, likely coming from a README.md file on the
+        Hugging Face Hub.
+
+    Returns:
+        - model_name (str):
+            The name of the model as found in the model index. This is used as the
+            identifier for the model on leaderboards like PapersWithCode.
+        - eval_results (List[EvalResult]):
+            A list of `modelcards.EvalResult` objects containing the metrics
+            reported in the provided model_index.
+
+    Example:
+        >>> from modelcards.card_data import model_index_to_eval_results
+        >>> # Define a minimal model index
+        >>> model_index = [
+        ...     {
+        ...         "name": "my-cool-model",
+        ...         "results": [
+        ...         {
+        ...             "task": {
+        ...             "type": "image-classification"
+        ...             },
+        ...             "dataset": {
+        ...             "type": "beans",
+        ...             "name": "Beans"
+        ...             },
+        ...             "metrics": [
+        ...             {
+        ...                 "type": "accuracy",
+        ...                 "value": 0.9
+        ...             }
+        ...             ]
+        ...         }
+        ...         ]
+        ...     }
+        ... ]
+        >>> model_name, eval_results = model_index_to_eval_results(model_index)
+        >>> model_name
+        'my-cool-model'
+        >>> eval_results[0].task_type
+        'image-classification'
+        >>> eval_results[0].metric_type
+        'accuracy'
+    """
+
     eval_results = []
     for elem in model_index:
         name = elem["name"]
@@ -163,7 +235,40 @@ def _remove_none(obj):
 
 
 def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult]):
-    """Takes in given model name and list of `modelcards.EvalResult` and returns a valid model-index"""
+    """Takes in given model name and list of `modelcards.EvalResult` and returns a
+    valid model-index that will be compatible with the format expected by the
+    Hugging Face Hub.
+
+    Args:
+        model_name (str):
+            Name of the model (ex. "my-cool-model"). This is used as the identifier
+            for the model on leaderboards like PapersWithCode.
+        eval_results (List[EvalResult]):
+            List of `modelcards.EvalResult` objects containing the metrics to be
+            reported in the model-index.
+
+    Returns:
+        model_index (List[Dict[str, Any]]): The eval_results converted to a model-index.
+
+    Example:
+        >>> from modelcards.card_data import eval_results_to_model_index, EvalResult
+        >>> # Define minimal eval_results
+        >>> eval_results = [
+        ...     EvalResult(
+        ...         task_type="image-classification",  # Required
+        ...         dataset_type="beans",  # Required
+        ...         dataset_name="Beans",  # Required
+        ...         metric_type="accuracy",  # Required
+        ...         metric_value=0.9,  # Required
+        ...     )
+        ... ]
+        >>> eval_results_to_model_index("my-cool-model", eval_results)
+        [{'name': 'my-cool-model', 'results': [{'task': {'type': 'image-classification'}, 'dataset': {'type': 'beans', 'name': 'Beans'}, 'metrics': [{'type': 'accuracy', 'value': 0.9}]}]}]
+
+    """
+
+    # Metrics are reported on a unique task-and-dataset basis.
+    # Here, we make a map of those pairs and the associated EvalResults.
     task_and_ds_types_map = dict()
     for eval_result in eval_results:
         task_and_ds_pair = (eval_result.task_type, eval_result.dataset_type)
@@ -172,6 +277,7 @@ def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult])
         else:
             task_and_ds_types_map[task_and_ds_pair] = [eval_result]
 
+    # Use the map from above to generate the model index data.
     model_index_data = []
     for (task_type, dataset_type), results in task_and_ds_types_map.items():
         data = {
@@ -200,6 +306,8 @@ def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult])
         }
         model_index_data.append(data)
 
+    # TODO - Check if there cases where this list is longer than one?
+    # Finally, the model index itself is list of dicts.
     model_index = [
         {
             "name": model_name,
