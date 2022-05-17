@@ -7,6 +7,8 @@ import jinja2
 import yaml
 from huggingface_hub import hf_hub_download, upload_file
 
+from .card_data import CardData, EvalResult, model_index_to_eval_results
+
 TEMPLATE_MODELCARD_PATH = Path(__file__).parent / "modelcard_template.md"
 REGEX_YAML_BLOCK = re.compile(r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL)
 
@@ -18,14 +20,19 @@ class RepoCard:
         if match:
             yaml_block = match.group(1)
             self.text = match.group(2)
-            self.data = yaml.safe_load(yaml_block)
-            if not isinstance(self.data, dict):
+            data_dict = yaml.safe_load(yaml_block)
+            if not isinstance(data_dict, dict):
                 raise ValueError("repo card metadata block should be a dict")
         else:
             raise ValueError("could not find yaml block in repo card")
 
+        model_index = data_dict.pop('model-index', None)
+        if model_index:
+            data_dict['eval_results'] = model_index_to_eval_results(model_index)
+        self.data = CardData(**data_dict)
+
     def __str__(self):
-        return f"---\n{yaml.dump(self.data, sort_keys=False)}\n---\n{self.text}"
+        return f"---\n{self.data.to_yaml()}\n---\n{self.text}"
 
     def save(self, filepath: Union[Path, str]):
         filepath = Path(filepath)
@@ -58,33 +65,30 @@ class ModelCard(RepoCard):
     @classmethod
     def from_template(
         cls,
-        language: Union[str, List[str]] = None,
-        license: str = None,
+        language: Optional[Union[str, List[str]]] = None,
+        license: Optional[str] = None,
         library_name: Optional[str] = None,
-        tags: List[str] = None,
-        dataset: List[str] = None,
-        metrics: List[str] = None,
-        template_path: str = TEMPLATE_MODELCARD_PATH,
+        tags: Optional[List[str]] = None,
+        datasets: Optional[Union[str, List[str]]] = None,
+        metrics: Optional[Union[str, List[str]]] = None,
+        eval_results: Optional[Union[List[EvalResult], EvalResult]] = None,
+        template_path: Optional[str] = TEMPLATE_MODELCARD_PATH,
         **template_kwargs,
     ):
-        if type(language) == str:
-            language = [language]
-        if type(tags) == str:
-            tags = [tags]
-        if type(dataset) == str:
-            dataset = [dataset]
-        if type(metrics) == str:
-            metrics = [metrics]
 
-        card_data = {
-            'language': language,
-            'license': license,
-            'library_name': library_name,
-            'tags': tags,
-            'dataset': dataset,
-            'metrics': metrics,
-        }
+        if type(eval_results) == EvalResult:
+            eval_results = [eval_results]
+
+        card_data = CardData(
+            language=language,
+            license=license,
+            library_name=library_name,
+            tags=tags,
+            datasets=datasets,
+            metrics=metrics,
+            eval_results=eval_results,
+        )
         content = jinja2.Template(Path(template_path).read_text()).render(
-            card_data=yaml.dump(card_data, sort_keys=False).strip(), **template_kwargs
+            card_data=card_data.to_yaml(), **template_kwargs
         )
         return cls(content)
