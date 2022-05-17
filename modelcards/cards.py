@@ -8,7 +8,9 @@ import yaml
 from huggingface_hub import hf_hub_download, upload_file
 
 TEMPLATE_MODELCARD_PATH = Path(__file__).parent / "modelcard_template.md"
-REGEX_YAML_BLOCK = re.compile(r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL)
+REGEX_YAML_BLOCK = re.compile(
+    r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL
+)
 
 
 class RepoCard:
@@ -47,7 +49,7 @@ class RepoCard:
             tmp_path.write_text(str(self))
             upload_file(
                 path_or_fileobj=str(tmp_path),
-                path_in_repo='README.md',
+                path_in_repo="README.md",
                 repo_id=repo_id,
                 repo_type=repo_type,
                 identical_ok=True,
@@ -77,12 +79,12 @@ class ModelCard(RepoCard):
             metrics = [metrics]
 
         card_data = {
-            'language': language,
-            'license': license,
-            'library_name': library_name,
-            'tags': tags,
-            'dataset': dataset,
-            'metrics': metrics,
+            "language": language,
+            "license": license,
+            "library_name": library_name,
+            "tags": tags,
+            "dataset": dataset,
+            "metrics": metrics,
         }
         content = jinja2.Template(Path(template_path).read_text()).render(
             card_data=yaml.dump(card_data, sort_keys=False).strip(), **template_kwargs

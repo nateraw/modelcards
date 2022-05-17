@@ -32,11 +32,17 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --requirement requirements.txt --upgrade --quiet --use-feature=2020-resolver
-        pip install pytest
+        pip install pytest black isort
         python --version
         pip --version
         pip list
       shell: bash
+
+    - name: Check black
+      run: black --check --diff .
+
+    - name: Check isort
+      run: isort --check --diff .
 
     - name: Tests
       run: |
