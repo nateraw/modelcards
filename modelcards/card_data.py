@@ -9,11 +9,6 @@ class EvalResult:
 
     # Required
 
-    # The model name.
-    # Example: If your repo ID is "nateraw/cool-model", then your model name is "cool-model".
-    # Example: "resnet50-imagenet-pretrained"
-    name: str
-
     # The task identifier
     # Example: automatic-speech-recognition
     task_type: str
@@ -84,13 +79,19 @@ class CardData:
     datasets: Optional[Union[str, List[str]]] = None
     metrics: Optional[Union[str, List[str]]] = None
     eval_results: Optional[List[EvalResult]] = None
+    model_name: Optional[str] = None
+
+    def __post_init__(self):
+        if self.eval_results:
+            if self.model_name is None:
+                raise ValueError('`eval_results` requires `model_name` to be set.')
 
     def to_dict(self):
 
         data_dict = asdict(self)
         if self.eval_results is not None:
-            data_dict['model-index'] = eval_results_to_model_index(self.eval_results)
-            del data_dict['eval_results']
+            data_dict['model-index'] = eval_results_to_model_index(self.model_name, self.eval_results)
+            del data_dict['eval_results'], data_dict['model_name']
 
         return _remove_none(data_dict)
 
@@ -121,7 +122,6 @@ def model_index_to_eval_results(model_index):
                 verified = metric.get('verified')
 
                 eval_result = EvalResult(
-                    name=name,  # Required
                     task_type=task_type,  # Required
                     dataset_type=dataset_type,  # Required
                     dataset_name=dataset_name,  # Required
@@ -137,7 +137,7 @@ def model_index_to_eval_results(model_index):
                     verified=verified,
                 )
                 eval_results.append(eval_result)
-    return eval_results
+    return name, eval_results
 
 
 def _remove_none(obj):
@@ -150,7 +150,7 @@ def _remove_none(obj):
         return obj
 
 
-def eval_results_to_model_index(eval_results: List[EvalResult]):
+def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult]):
 
     task_and_ds_types_map = dict()
     for eval_result in eval_results:
@@ -160,7 +160,6 @@ def eval_results_to_model_index(eval_results: List[EvalResult]):
         else:
             task_and_ds_types_map[task_and_ds_pair] = [eval_result]
 
-    model_name = eval_results[0].name
     model_index_data = []
     for (task_type, dataset_type), results in task_and_ds_types_map.items():
         data = {

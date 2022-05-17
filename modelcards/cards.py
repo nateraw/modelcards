@@ -28,7 +28,7 @@ class RepoCard:
 
         model_index = data_dict.pop('model-index', None)
         if model_index:
-            data_dict['eval_results'] = model_index_to_eval_results(model_index)
+            data_dict['model_name'], data_dict['eval_results'] = model_index_to_eval_results(model_index)
         self.data = CardData(**data_dict)
 
     def __str__(self):
@@ -72,6 +72,7 @@ class ModelCard(RepoCard):
         datasets: Optional[Union[str, List[str]]] = None,
         metrics: Optional[Union[str, List[str]]] = None,
         eval_results: Optional[Union[List[EvalResult], EvalResult]] = None,
+        model_name: Optional[str] = None,
         template_path: Optional[str] = TEMPLATE_MODELCARD_PATH,
         **template_kwargs,
     ):
