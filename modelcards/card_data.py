@@ -6,6 +6,7 @@ import yaml
 
 @dataclass
 class EvalResult:
+    """Flattened representation of individual evaluation results found in model-index."""
 
     # Required
 
@@ -72,6 +73,8 @@ class EvalResult:
 
 @dataclass
 class CardData:
+    """Model Card Metadata that is used by Hugging Face Hub when included at the top of your README.md"""
+
     language: Optional[Union[str, List[str]]] = None
     license: Optional[str] = None
     library_name: Optional[str] = None
@@ -100,6 +103,7 @@ class CardData:
 
 
 def model_index_to_eval_results(model_index):
+    """Takes in a model index and returns a list of `modelcards.EvalResult` objects."""
     eval_results = []
     for elem in model_index:
         name = elem['name']
@@ -151,7 +155,7 @@ def _remove_none(obj):
 
 
 def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult]):
-
+    """Takes in given model name and list of `modelcards.EvalResult` and returns a valid model-index"""
     task_and_ds_types_map = dict()
     for eval_result in eval_results:
         task_and_ds_pair = (eval_result.task_type, eval_result.dataset_type)
