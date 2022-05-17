@@ -88,6 +88,7 @@ class ModelCard(RepoCard):
             datasets=datasets,
             metrics=metrics,
             eval_results=eval_results,
+            model_name=model_name,
         )
         content = jinja2.Template(Path(template_path).read_text()).render(
             card_data=card_data.to_yaml(), **template_kwargs
