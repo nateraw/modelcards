@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 import jinja2
 import yaml
 from huggingface_hub import hf_hub_download, upload_file
+from huggingface_hub.utils.logging import get_logger
 
 from .card_data import CardData, EvalResult, model_index_to_eval_results
 
@@ -13,6 +14,8 @@ TEMPLATE_MODELCARD_PATH = Path(__file__).parent / "modelcard_template.md"
 REGEX_YAML_BLOCK = re.compile(
     r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL
 )
+
+logger = get_logger(__name__)
 
 
 class RepoCard:
@@ -30,20 +33,33 @@ class RepoCard:
         self.content = content
         match = REGEX_YAML_BLOCK.search(content)
         if match:
+            # Metadata found in the YAML block
             yaml_block = match.group(1)
             self.text = match.group(2)
             data_dict = yaml.safe_load(yaml_block)
+
+            # The YAML block's data should be a dictionary
             if not isinstance(data_dict, dict):
                 raise ValueError("repo card metadata block should be a dict")
         else:
-            raise ValueError("could not find yaml block in repo card")
+            # Model card without metadata... create empty metadata
+            logger.warning(
+                "Repo card metadata block was not found. Setting CardData to empty."
+            )
+            data_dict = {}
+            self.text = content
 
         model_index = data_dict.pop("model-index", None)
         if model_index:
-            (
-                data_dict["model_name"],
-                data_dict["eval_results"],
-            ) = model_index_to_eval_results(model_index)
+            try:
+                model_name, eval_results = model_index_to_eval_results(model_index)
+                data_dict["model_name"] = model_name
+                data_dict["eval_results"] = eval_results
+            except KeyError:
+                logger.warning(
+                    "Invalid model-index. Not loading eval results into CardData."
+                )
+
         self.data = CardData(**data_dict)
 
     def __str__(self):
