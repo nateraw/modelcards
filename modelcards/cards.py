@@ -114,6 +114,15 @@ class RepoCard:
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
         """
+        repo_name = repo_id.split("/")[-1]
+
+        if self.data.model_name and self.data.model_name != repo_name:
+            logger.warning(
+                f"Set model name {self.data.model_name} in CardData does not match "
+                f"repo name {repo_name}. Updating model name to match repo name."
+            )
+            self.data.model_name = repo_name
+
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir) / "README.md"
             tmp_path.write_text(str(self))
