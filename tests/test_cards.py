@@ -1,9 +1,10 @@
+import logging
 import tempfile
 from pathlib import Path
 
 import pytest
 
-from modelcards import ModelCard, RepoCard
+from modelcards import CardData, ModelCard, RepoCard
 
 
 def test_load_repocard_from_file():
@@ -88,3 +89,23 @@ def test_model_card_data_must_be_dict():
     sample_path = Path(__file__).parent / "samples" / "sample_invalid_card_data.md"
     with pytest.raises(ValueError, match="repo card metadata block should be a dict"):
         ModelCard.load(sample_path)
+
+
+def test_model_card_without_metadata(caplog):
+    sample_path = Path(__file__).parent / "samples" / "sample_no_metadata.md"
+    with caplog.at_level(logging.WARNING):
+        card = ModelCard.load(sample_path)
+    assert (
+        "Repo card metadata block was not found. Setting CardData to empty."
+        in caplog.text
+    )
+    assert card.data == CardData()
+
+
+def test_model_card_with_invalid_model_index(caplog):
+    """Test that when loading a card that has invalid model-index, no eval_results are added + it logs a warning"""
+    sample_path = Path(__file__).parent / "samples" / "sample_invalid_model_index.md"
+    with caplog.at_level(logging.WARNING):
+        card = ModelCard.load(sample_path)
+    assert "Invalid model-index. Not loading eval results into CardData." in caplog.text
+    assert card.data.eval_results is None
