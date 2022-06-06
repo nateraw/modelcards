@@ -134,3 +134,6 @@ def test_abitrary_incoming_card_data():
     )
 
     assert data.some_abitrary_kwarg == "some_value"
+
+    data_dict = data.to_dict()
+    assert data_dict["some_abitrary_kwarg"] == "some_value"
