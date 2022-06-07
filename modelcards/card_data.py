@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
@@ -154,7 +155,7 @@ class CardData:
             block for inclusion in a README.md file.
         """
 
-        data_dict = self.__dict__
+        data_dict = copy.deepcopy(self.__dict__)
         if self.eval_results is not None:
             data_dict["model-index"] = eval_results_to_model_index(
                 self.model_name, self.eval_results
