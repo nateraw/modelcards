@@ -49,7 +49,7 @@ card = ModelCard.from_template(
         license='mit',
         library_name='timm',
         tags=['image-classification', 'resnet'],
-        datasets='imagenet',
+        datasets='beans',
         metrics=['accuracy', 'f1'],
     ),
     model_id=repo_id.split('/')[-1],  # Jinja template kwarg
