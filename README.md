@@ -39,20 +39,25 @@ card.push_to_hub("nateraw/food")
 Make model cards from the [default model card template](https://github.com/nateraw/modelcards/blob/main/modelcards/modelcard_template.md).
 
 ```python
-from modelcards import ModelCard
+from modelcards import CardData, ModelCard
 
 repo_id = "nateraw/my-cool-model-with-card"
 
-# Write/overwrite the model card in that repo
-card = ModelCard.from_template(
+# Card metadata that will be included as a YAML block at the top of the card.
+card_data = CardData(
     language='en',
     license='mit',
     library_name='timm',
     tags=['image-classification', 'resnet'],
     datasets='imagenet',
     metrics=['acc', 'f1'],
-    model_id=repo_id.split('/')[-1],  # Included in the template
-    model_description="Some really helpful description...",  # Included in the template
+)
+
+# Initialize card from default template, including card data defined above
+card = ModelCard.from_template(
+    card_data,
+    model_id=repo_id.split('/')[-1],  # Jinja template kwarg
+    model_description="Some really helpful description...",  # Jinja template kwarg
 )
 ```
 
