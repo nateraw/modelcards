@@ -39,12 +39,14 @@ def test_change_repocard_data():
 def test_model_card_from_default_template():
 
     card = ModelCard.from_template(
-        language="en",
-        license="mit",
-        library_name="pytorch",
-        tags=["image-classification", "resnet"],
-        datasets="imagenet",
-        metrics=["acc", "f1"],
+        card_data=CardData(
+            language="en",
+            license="mit",
+            library_name="pytorch",
+            tags=["image-classification", "resnet"],
+            datasets="imagenet",
+            metrics=["acc", "f1"],
+        ),
         model_id=None,
     )
     assert card.text.strip().startswith(
@@ -54,12 +56,14 @@ def test_model_card_from_default_template():
 
 def test_model_card_from_default_template_with_model_id():
     card = ModelCard.from_template(
-        language="en",
-        license="mit",
-        library_name="pytorch",
-        tags=["image-classification", "resnet"],
-        datasets="imagenet",
-        metrics=["acc", "f1"],
+        card_data=CardData(
+            language="en",
+            license="mit",
+            library_name="pytorch",
+            tags=["image-classification", "resnet"],
+            datasets="imagenet",
+            metrics=["acc", "f1"],
+        ),
         model_id="my-cool-model",
     )
     assert card.text.strip().startswith(
@@ -70,12 +74,14 @@ def test_model_card_from_default_template_with_model_id():
 def test_model_card_from_custom_template():
     template_path = Path(__file__).parent / "samples" / "sample_template.md"
     card = ModelCard.from_template(
-        language="en",
-        license="mit",
-        library_name="pytorch",
-        tags="text-classification",
-        datasets="glue",
-        metrics="acc",
+        card_data=CardData(
+            language="en",
+            license="mit",
+            library_name="pytorch",
+            tags="text-classification",
+            datasets="glue",
+            metrics="acc",
+        ),
         template_path=template_path,
         some_data="asdf",
     )

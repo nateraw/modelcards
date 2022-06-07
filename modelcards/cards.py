@@ -1,14 +1,14 @@
 import re
 import tempfile
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import jinja2
 import yaml
 from huggingface_hub import hf_hub_download, upload_file
 from huggingface_hub.utils.logging import get_logger
 
-from .card_data import CardData, EvalResult, model_index_to_eval_results
+from .card_data import CardData, model_index_to_eval_results
 
 TEMPLATE_MODELCARD_PATH = Path(__file__).parent / "modelcard_template.md"
 REGEX_YAML_BLOCK = re.compile(
@@ -110,7 +110,7 @@ class RepoCard:
         Args:
             repo_id (str):
                 The repo ID of the Hugging Face Hub repo to push to. Example: "nateraw/food".
-            repo_type (str, optional):
+            repo_type (str, *optional*):
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
         """
@@ -139,14 +139,7 @@ class ModelCard(RepoCard):
     @classmethod
     def from_template(
         cls,
-        language: Optional[Union[str, List[str]]] = None,
-        license: Optional[str] = None,
-        library_name: Optional[str] = None,
-        tags: Optional[List[str]] = None,
-        datasets: Optional[Union[str, List[str]]] = None,
-        metrics: Optional[Union[str, List[str]]] = None,
-        eval_results: Optional[Union[List[EvalResult], EvalResult]] = None,
-        model_name: Optional[str] = None,
+        card_data: CardData,
         template_path: Optional[str] = TEMPLATE_MODELCARD_PATH,
         **template_kwargs,
     ):
@@ -155,32 +148,10 @@ class ModelCard(RepoCard):
         Templates are Jinja2 templates that can be customized by passing keyword arguments.
 
         Args:
-            language (Optional[Union[str, List[str]]], optional):
-                Language of model's training data or metadata. Example: 'en' Defaults to None.
-            license (Optional[str], optional):
-                License of this model. Example: apache-2.0 or any license from
-                https://hf.co/docs/hub/model-repos#list-of-license-identifiers. Defaults to None.
-            library_name (Optional[str], optional):
-                Name of library used by this model. Example: keras or any library from
-                https://github.com/huggingface/huggingface_hub/blob/main/js/src/lib/interfaces/Libraries.ts.
-                Defaults to None.
-            tags (Optional[List[str]], optional):
-                List of tags to add to your model that can be used when filtering on the Hugging
-                Face Hub. Defaults to None.
-            datasets (Optional[Union[str, List[str]]], optional):
-                Dataset or list of datasets that were used to train this model. Should be a dataset ID
-                found on https://hf.co/datasets. Defaults to None.
-            metrics (Optional[Union[str, List[str]]], optional):
-                List of metrics used to evaluate this model. Should be a metric name that can be found
-                at https://hf.co/metrics. Example: 'accuracy'. Defaults to None.
-            eval_results (Optional[Union[List[EvalResult], EvalResult]], optional):
-                List of `modelcards.EvalResult` that define evaluation results of the model. If provided,
-                model_name kwarg must be provided. Defaults to None.
-            model_name (Optional[str], optional):
-                A name for this model. Required if you provide `eval_results`. It is used along with
-                `eval_results` to construct the `model-index` within the card's metadata. The name
-                you supply here is what will be used on PapersWithCode's leaderboards. Defaults to None.
-            template_path (Optional[str], optional):
+            card_data (modelcards.CardData, *required*):
+                A modelcards.CardData instance containing the metadata you want to include in the YAML
+                header of the model card on the Hugging Face Hub.
+            template_path (str, *optional*):
                 A path to a markdown file with optional Jinja template variables that can be filled
                 in with `template_kwargs`. Defaults to the default template which can be found here:
                 https://github.com/nateraw/modelcards/blob/main/modelcards/modelcard_template.md
@@ -190,20 +161,24 @@ class ModelCard(RepoCard):
             template.
 
         Example:
-            >>> from modelcards import ModelCard
+            >>> from modelcards import ModelCard, CardData, EvalResult
 
             >>> # Using the Default Template
-            >>> card = ModelCard.from_template(
+            >>> card_data = CardData(
             ...     language='en',
             ...     license='mit',
             ...     library_name='timm',
             ...     tags=['image-classification', 'resnet'],
-            ...     datasets='imagenet',
+            ...     datasets='beans',
             ...     metrics=['accuracy'],
+            ... )
+            >>> card = ModelCard.from_template(
+            ...     card_data,
+            ...     model_description='This model does x + y...'
             ... )
 
             >>> # Including Evaluation Results
-            >>> card = ModelCard.from_template(
+            >>> card_data = CardData(
             ...     language='en',
             ...     tags=['image-classification', 'resnet'],
             ...     eval_results=[
@@ -211,32 +186,26 @@ class ModelCard(RepoCard):
             ...             task_type='image-classification',
             ...             dataset_type='beans',
             ...             dataset_name='Beans',
-            ...             metric_type='acc',
+            ...             metric_type='accuracy',
             ...             metric_value=0.9,
             ...         ),
             ...     ],
             ...     model_name='my-cool-model',
             ... )
+            >>> card = ModelCard.from_template(card_data)
 
             >>> # Using a Custom Template
-            >>> card = ModelCard.from_template(
+            >>> card_data = CardData(
             ...     language='en',
-            ...     tags=['image-classification', 'resnet'],
+            ...     tags=['image-classification', 'resnet']
+            ... )
+            >>> card = ModelCard.from_template(
+            ...     card_data=card_data,
             ...     template_path='./modelcards/modelcard_template.md',
-            ...     custom_template_var='custom value',  # will be replaced in template
+            ...     custom_template_var='custom value',  # will be replaced in template if it exists
             ... )
 
         """
-        card_data = CardData(
-            language=language,
-            license=license,
-            library_name=library_name,
-            tags=tags,
-            datasets=datasets,
-            metrics=metrics,
-            eval_results=eval_results,
-            model_name=model_name,
-        )
         content = jinja2.Template(Path(template_path).read_text()).render(
             card_data=card_data.to_yaml(), **template_kwargs
         )
