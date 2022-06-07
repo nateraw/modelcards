@@ -89,7 +89,7 @@ class CardData:
 
         Args:
             language (Optional[Union[str, List[str]]], optional):
-                Language of model's training data or metadata. Example: 'en' Defaults to None.
+                Language of model's training data or metadata. Example: `'en'`. Defaults to `None`.
             license (Optional[str], optional):
                 License of this model. Example: apache-2.0 or any license from
                 https://hf.co/docs/hub/model-repos#list-of-license-identifiers. Defaults to None.
@@ -108,7 +108,7 @@ class CardData:
                 at https://hf.co/metrics. Example: 'accuracy'. Defaults to None.
             eval_results (Optional[Union[List[EvalResult], EvalResult]], optional):
                 List of `modelcards.EvalResult` that define evaluation results of the model. If provided,
-                model_name kwarg must be provided. Defaults to None.
+                `model_name` kwarg must be provided. Defaults to `None`.
             model_name (Optional[str], optional):
                 A name for this model. Required if you provide `eval_results`. It is used along with
                 `eval_results` to construct the `model-index` within the card's metadata. The name
