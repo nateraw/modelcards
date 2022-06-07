@@ -116,3 +116,24 @@ def test_card_data_requires_model_name_for_eval_results():
 
     assert model_index[0]["name"] == "my-cool-model"
     assert model_index[0]["results"][0]["task"]["type"] == "image-classification"
+
+
+def test_abitrary_incoming_card_data():
+    data = CardData(
+        model_name="my-cool-model",
+        eval_results=[
+            EvalResult(
+                task_type="image-classification",
+                dataset_type="beans",
+                dataset_name="Beans",
+                metric_type="acc",
+                metric_value=0.9,
+            ),
+        ],
+        some_abitrary_kwarg="some_value",
+    )
+
+    assert data.some_abitrary_kwarg == "some_value"
+
+    data_dict = data.to_dict()
+    assert data_dict["some_abitrary_kwarg"] == "some_value"
