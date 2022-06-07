@@ -27,7 +27,7 @@ card = ModelCard.load("nateraw/food")
 print(card.data)
 
 # Update its card data
-card.data["library_name"] = "timm"
+card.data.library_name = "transformers"
 
 # Save it to a file
 card.save("my_card.md")
@@ -49,7 +49,7 @@ card = ModelCard.from_template(
     license='mit',
     library_name='timm',
     tags=['image-classification', 'resnet'],
-    dataset='imagenet',
+    datasets='imagenet',
     metrics=['acc', 'f1'],
     model_id=repo_id.split('/')[-1],  # Included in the template
     model_description="Some really helpful description...",  # Included in the template
