@@ -167,6 +167,9 @@ class CardData:
         """Dumps CardData to a YAML block for inclusion in a README.md file."""
         return yaml.dump(self.to_dict(), sort_keys=False).strip()
 
+    def __repr__(self):
+        return self.to_yaml()
+
 
 def model_index_to_eval_results(model_index: List[Dict[str, Any]]):
     """Takes in a model index and returns a list of `modelcards.EvalResult` objects.
