@@ -186,7 +186,7 @@ class ModelCard(RepoCard):
             ...             task_type='image-classification',
             ...             dataset_type='beans',
             ...             dataset_name='Beans',
-            ...             metric_type='acc',
+            ...             metric_type='accuracy',
             ...             metric_value=0.9,
             ...         ),
             ...     ],
