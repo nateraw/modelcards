@@ -1,10 +1,9 @@
 # modelcards
 
-<a href="https://colab.research.google.com/github/nateraw/modelcards/blob/main/modelcards_demo.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-
 📝 Utility to create, edit, and publish model cards on the Hugging Face Hub.
 
-This repo is just an idea for now! :)
+For a full walkthrough, try the demo in Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nateraw/modelcards/blob/main/modelcards_demo.ipynb)
+
 
 ## Usage
 
