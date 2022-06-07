@@ -42,7 +42,7 @@ from modelcards import CardData, ModelCard
 
 repo_id = "nateraw/my-cool-model-with-card"
 
-# Initialize card from default template, including card data defined above
+# Initialize card from default template, including card metadata
 card = ModelCard.from_template(
     card_data=CardData(  # Card metadata object that will be converted to YAML block
         language='en',
