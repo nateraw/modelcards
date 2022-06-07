@@ -89,32 +89,32 @@ class CardData:
         """Model Card Metadata that is used by Hugging Face Hub when included at the top of your README.md
 
         Args:
-            language (Optional[Union[str, List[str]]], optional):
+            language (Union[str, List[str]], *optional*):
                 Language of model's training data or metadata. Example: `'en'`. Defaults to `None`.
-            license (Optional[str], optional):
+            license (str, *optional*):
                 License of this model. Example: apache-2.0 or any license from
                 https://hf.co/docs/hub/model-repos#list-of-license-identifiers. Defaults to None.
-            library_name (Optional[str], optional):
+            library_name (str, *optional*):
                 Name of library used by this model. Example: keras or any library from
                 https://github.com/huggingface/huggingface_hub/blob/main/js/src/lib/interfaces/Libraries.ts.
                 Defaults to None.
-            tags (Optional[List[str]], optional):
+            tags (List[str], *optional*):
                 List of tags to add to your model that can be used when filtering on the Hugging
                 Face Hub. Defaults to None.
-            datasets (Optional[Union[str, List[str]]], optional):
+            datasets (Union[str, List[str]], *optional*):
                 Dataset or list of datasets that were used to train this model. Should be a dataset ID
                 found on https://hf.co/datasets. Defaults to None.
-            metrics (Optional[Union[str, List[str]]], optional):
+            metrics (Union[str, List[str]], *optional*):
                 List of metrics used to evaluate this model. Should be a metric name that can be found
                 at https://hf.co/metrics. Example: 'accuracy'. Defaults to None.
-            eval_results (Optional[Union[List[EvalResult], EvalResult]], optional):
+            eval_results (Union[List[EvalResult], EvalResult], *optional*):
                 List of `modelcards.EvalResult` that define evaluation results of the model. If provided,
                 `model_name` kwarg must be provided. Defaults to `None`.
-            model_name (Optional[str], optional):
+            model_name (str, *optional*):
                 A name for this model. Required if you provide `eval_results`. It is used along with
                 `eval_results` to construct the `model-index` within the card's metadata. The name
                 you supply here is what will be used on PapersWithCode's leaderboards. Defaults to None.
-            kwargs (dict, optional):
+            kwargs (dict, *optional*):
                 Additional metadata that will be added to the model card. Defaults to None.
 
         Example:
