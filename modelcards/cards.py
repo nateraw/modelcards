@@ -111,7 +111,7 @@ class RepoCard:
             repo_id (str):
                 The repo ID of the Hugging Face Hub repo to push to. Example: "nateraw/food".
             token (str, *optional*):
-                Authentication token, obtained with `HfApi.login` method. Will default to
+                Authentication token, obtained with `huggingface_hub.HfApi.login` method. Will default to
                 the stored token.
             repo_type (str, *optional*):
                 The type of Hugging Face repo to push to. Defaults to None, which will use
