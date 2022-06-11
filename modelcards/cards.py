@@ -104,12 +104,15 @@ class RepoCard:
 
         return cls(Path(card_path).read_text())
 
-    def push_to_hub(self, repo_id, repo_type=None):
+    def push_to_hub(self, repo_id, token=None, repo_type=None):
         """Push a RepoCard to a Hugging Face Hub repo.
 
         Args:
             repo_id (str):
                 The repo ID of the Hugging Face Hub repo to push to. Example: "nateraw/food".
+            token (str, *optional*):
+                Authentication token, obtained with `huggingface_hub.HfApi.login` method. Will default to
+                the stored token.
             repo_type (str, *optional*):
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
@@ -130,6 +133,7 @@ class RepoCard:
                 path_or_fileobj=str(tmp_path),
                 path_in_repo="README.md",
                 repo_id=repo_id,
+                token=token,
                 repo_type=repo_type,
                 identical_ok=True,
             )
