@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import jinja2
+import requests
 import yaml
 from huggingface_hub import hf_hub_download, upload_file
 from huggingface_hub.utils.logging import get_logger
@@ -104,6 +105,36 @@ class RepoCard:
 
         return cls(Path(card_path).read_text())
 
+    def validate(self, repo_type=None):
+        """Validates card against Hugging Face Hub's model card validation logic.
+        Using this function requires access to the internet, so it is only called
+        internally by `modelcards.ModelCard.push_to_hub`.
+
+        Args:
+            repo_type (str, *optional*):
+                The type of Hugging Face repo to push to. Defaults to None, which will use
+                use "model". Other options are "dataset" and "space".
+        """
+        if repo_type is None:
+            repo_type = "model"
+
+        # TODO - compare against repo types constant in huggingface_hub if we move this object there.
+        if repo_type not in ["model", "space", "dataset"]:
+            raise RuntimeError(
+                "Provided repo_type '{repo_type}' should be one of ['model', 'space',"
+                " 'dataset']."
+            )
+
+        body = {
+            "repoType": repo_type,
+            "repoId": "huggingface/some-repo-name",
+            "content": str(self),
+        }
+        r = requests.get("https://huggingface.co/validate-yaml", body)
+
+        if r.status_code == 400:
+            raise RuntimeError(r.content)  # b'- Error: YAML....'
+
     def push_to_hub(self, repo_id, token=None, repo_type=None):
         """Push a RepoCard to a Hugging Face Hub repo.
 
@@ -125,6 +156,9 @@ class RepoCard:
                 f"repo name {repo_name}. Updating model name to match repo name."
             )
             self.data.model_name = repo_name
+
+        # Validate card before pushing to hub
+        self.validate(repo_type=repo_type)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir) / "README.md"
