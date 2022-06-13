@@ -130,7 +130,9 @@ class RepoCard:
             "repoId": "huggingface/some-repo-name",
             "content": str(self),
         }
-        r = requests.get("https://huggingface.co/validate-yaml", body)
+        headers = {"Accept": "text/plain"}
+
+        r = requests.post("https://huggingface.co/validate-yaml", body, headers=headers)
 
         if r.status_code == 400:
             raise RuntimeError(r.content)  # b'- Error: YAML....'
