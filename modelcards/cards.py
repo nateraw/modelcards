@@ -132,10 +132,16 @@ class RepoCard:
         }
         headers = {"Accept": "text/plain"}
 
-        r = requests.post("https://huggingface.co/validate-yaml", body, headers=headers)
-
-        if r.status_code == 400:
-            raise RuntimeError(r.content)  # b'- Error: YAML....'
+        try:
+            r = requests.post(
+                "https://huggingface.co/validate-yaml", body, headers=headers
+            )
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as exc:
+            if r.status_code == 400:
+                raise RuntimeError(r.text)
+            else:
+                raise exc
 
     def push_to_hub(self, repo_id, token=None, repo_type=None):
         """Push a RepoCard to a Hugging Face Hub repo.
