@@ -115,3 +115,15 @@ def test_model_card_with_invalid_model_index(caplog):
         card = ModelCard.load(sample_path)
     assert "Invalid model-index. Not loading eval results into CardData." in caplog.text
     assert card.data.eval_results is None
+
+
+def test_validate_modelcard(caplog):
+    sample_path = Path(__file__).parent / "samples" / "sample_simple.md"
+    card = RepoCard.load(sample_path)
+    card.validate()
+
+    card.data.license = "asdf"
+    with pytest.raises(
+        RuntimeError, match='- Error: YAML metadata schema issue on key "license"'
+    ):
+        card.validate()
