@@ -127,7 +127,6 @@ class RepoCard:
 
         body = {
             "repoType": repo_type,
-            "repoId": "huggingface/some-repo-name",
             "content": str(self),
         }
         headers = {"Accept": "text/plain"}
