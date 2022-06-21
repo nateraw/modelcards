@@ -105,7 +105,7 @@ class RepoCard:
 
         return cls(Path(card_path).read_text())
 
-    def validate(self, repo_type=None):
+    def validate(self, repo_type="model"):
         """Validates card against Hugging Face Hub's model card validation logic.
         Using this function requires access to the internet, so it is only called
         internally by `modelcards.ModelCard.push_to_hub`.
