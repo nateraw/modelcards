@@ -1,10 +1,24 @@
 import logging
 import tempfile
+import uuid
 from pathlib import Path
 
 import pytest
+import requests
+from huggingface_hub import create_repo, delete_repo
 
 from modelcards import CardData, ModelCard, RepoCard
+
+from .hub_fixtures import HF_TOKEN, HF_USERNAME
+
+
+@pytest.fixture
+def repo_id(request):
+    fn_name = request.node.name.lstrip("test_").replace("_", "-")
+    repo_id = f"{HF_USERNAME}/{fn_name}-{uuid.uuid4()}"
+    create_repo(repo_id, token=HF_TOKEN)
+    yield repo_id
+    delete_repo(repo_id, token=HF_TOKEN)
 
 
 def test_load_repocard_from_file():
@@ -127,3 +141,58 @@ def test_validate_modelcard(caplog):
         RuntimeError, match='- Error: YAML metadata schema issue on key "license"'
     ):
         card.validate()
+
+
+def test_push_to_hub(repo_id):
+    template_path = Path(__file__).parent / "samples" / "sample_template.md"
+    card = ModelCard.from_template(
+        card_data=CardData(
+            language="en",
+            license="mit",
+            library_name="pytorch",
+            tags="text-classification",
+            datasets="glue",
+            metrics="acc",
+        ),
+        template_path=template_path,
+        some_data="asdf",
+    )
+
+    url = f"https://huggingface.co/{repo_id}/resolve/main/README.md"
+
+    # Check this file doesn't exist (sanity check)
+    with pytest.raises(requests.exceptions.HTTPError):
+        r = requests.get(url)
+        r.raise_for_status()
+
+    # Push the card up to README.md in the repo
+    card.push_to_hub(repo_id, token=HF_TOKEN)
+
+    # No error should occur now, as README.md should exist
+    r = requests.get(url)
+    r.raise_for_status()
+
+
+def test_push_and_create_pr(repo_id):
+    template_path = Path(__file__).parent / "samples" / "sample_template.md"
+    card = ModelCard.from_template(
+        card_data=CardData(
+            language="en",
+            license="mit",
+            library_name="pytorch",
+            tags="text-classification",
+            datasets="glue",
+            metrics="acc",
+        ),
+        template_path=template_path,
+        some_data="asdf",
+    )
+
+    url = f"https://huggingface.co/api/models/{repo_id}/discussions"
+    r = requests.get(url)
+    data = r.json()
+    assert data["count"] == 0
+    card.push_to_hub(repo_id, token=HF_TOKEN, create_pr=True)
+    r = requests.get(url)
+    data = r.json()
+    assert data["count"] == 1
