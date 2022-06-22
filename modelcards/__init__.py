@@ -5,4 +5,4 @@
 from .card_data import CardData, EvalResult
 from .cards import ModelCard, RepoCard
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
