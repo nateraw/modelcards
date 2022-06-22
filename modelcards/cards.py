@@ -142,7 +142,7 @@ class RepoCard:
             else:
                 raise exc
 
-    def push_to_hub(self, repo_id, token=None, repo_type=None):
+    def push_to_hub(self, repo_id, token=None, repo_type=None, create_pr=None):
         """Push a RepoCard to a Hugging Face Hub repo.
 
         Args:
@@ -154,6 +154,8 @@ class RepoCard:
             repo_type (str, *optional*):
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
+            create_pr (bool, *optional*):
+                Whether or not to create a Pull Request with this commit. Defaults to `False`.
         """
         repo_name = repo_id.split("/")[-1]
 
@@ -177,6 +179,7 @@ class RepoCard:
                 token=token,
                 repo_type=repo_type,
                 identical_ok=True,
+                create_pr=create_pr,
             )
 
 
