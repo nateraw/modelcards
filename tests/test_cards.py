@@ -16,13 +16,9 @@ from .hub_fixtures import HF_TOKEN, HF_USERNAME
 def repo_id(request):
     fn_name = request.node.name.lstrip("test_").replace("_", "-")
     repo_id = f"{HF_USERNAME}/{fn_name}-{uuid.uuid4()}"
+    create_repo(repo_id, token=HF_TOKEN)
     yield repo_id
     delete_repo(repo_id, token=HF_TOKEN)
-
-
-@pytest.fixture
-def hf_token():
-    return HF_TOKEN
 
 
 def test_load_repocard_from_file():
@@ -147,7 +143,7 @@ def test_validate_modelcard(caplog):
         card.validate()
 
 
-def test_push_to_hub(repo_id, hf_token):
+def test_push_to_hub(repo_id):
     template_path = Path(__file__).parent / "samples" / "sample_template.md"
     card = ModelCard.from_template(
         card_data=CardData(
@@ -162,13 +158,16 @@ def test_push_to_hub(repo_id, hf_token):
         some_data="asdf",
     )
 
+    url = f"https://huggingface.co/{repo_id}/resolve/main/README.md"
+
+    # Check this file doesn't exist (sanity check)
     with pytest.raises(requests.exceptions.HTTPError):
-        r = requests.get("https://huggingface.co/{repo_id}")
+        r = requests.get(url)
         r.raise_for_status()
 
-    create_repo(repo_id, token=hf_token)
-    card.push_to_hub(repo_id, token=hf_token)
+    # Push the card up to README.md in the repo
+    card.push_to_hub(repo_id, token=HF_TOKEN)
 
-    url = f"https://huggingface.co/{repo_id}/resolve/main/README.md"
+    # No error should occur now, as README.md should exist
     r = requests.get(url)
     r.raise_for_status()
