@@ -155,8 +155,7 @@ class RepoCard:
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
             create_pr (bool, *optional*):
-                Whether or not to create a Pull Request instead of pushing directly to the repo.
-                Defaults to False.
+                Whether or not to create a Pull Request with this commit. Defaults to `False`.
         """
         repo_name = repo_id.split("/")[-1]
 
@@ -180,7 +179,7 @@ class RepoCard:
                 token=token,
                 repo_type=repo_type,
                 identical_ok=True,
-                create_pr=create_pr
+                create_pr=create_pr,
             )
 
 
