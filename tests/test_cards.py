@@ -171,3 +171,28 @@ def test_push_to_hub(repo_id):
     # No error should occur now, as README.md should exist
     r = requests.get(url)
     r.raise_for_status()
+
+
+def test_push_and_create_pr(repo_id):
+    template_path = Path(__file__).parent / "samples" / "sample_template.md"
+    card = ModelCard.from_template(
+        card_data=CardData(
+            language="en",
+            license="mit",
+            library_name="pytorch",
+            tags="text-classification",
+            datasets="glue",
+            metrics="acc",
+        ),
+        template_path=template_path,
+        some_data="asdf",
+    )
+
+    url = "https://huggingface.co/api/models/{repo_id}/discussions"
+    r = requests.get(url)
+    data = r.json()
+    assert data["count"] == 0
+    card.push_to_hub(repo_id, token=HF_TOKEN, create_pr=True)
+    r = requests.get(url)
+    data = r.json()
+    assert data["count"] == 1
