@@ -1,10 +1,28 @@
 import logging
 import tempfile
+import uuid
 from pathlib import Path
 
 import pytest
+import requests
+from huggingface_hub import create_repo, delete_repo
 
 from modelcards import CardData, ModelCard, RepoCard
+
+from .hub_fixtures import HF_TOKEN, HF_USERNAME
+
+
+@pytest.fixture
+def repo_id(request):
+    fn_name = request.node.name.lstrip("test_").replace("_", "-")
+    repo_id = f"{HF_USERNAME}/{fn_name}-{uuid.uuid4()}"
+    yield repo_id
+    delete_repo(repo_id, token=HF_TOKEN)
+
+
+@pytest.fixture
+def hf_token():
+    return HF_TOKEN
 
 
 def test_load_repocard_from_file():
@@ -127,3 +145,30 @@ def test_validate_modelcard(caplog):
         RuntimeError, match='- Error: YAML metadata schema issue on key "license"'
     ):
         card.validate()
+
+
+def test_push_to_hub(repo_id, hf_token):
+    template_path = Path(__file__).parent / "samples" / "sample_template.md"
+    card = ModelCard.from_template(
+        card_data=CardData(
+            language="en",
+            license="mit",
+            library_name="pytorch",
+            tags="text-classification",
+            datasets="glue",
+            metrics="acc",
+        ),
+        template_path=template_path,
+        some_data="asdf",
+    )
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        r = requests.get("https://huggingface.co/{repo_id}")
+        r.raise_for_status()
+
+    create_repo(repo_id, token=hf_token)
+    card.push_to_hub(repo_id, token=hf_token)
+
+    url = f"https://huggingface.co/{repo_id}/resolve/main/README.md"
+    r = requests.get(url)
+    r.raise_for_status()
