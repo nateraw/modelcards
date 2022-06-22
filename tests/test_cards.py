@@ -188,7 +188,7 @@ def test_push_and_create_pr(repo_id):
         some_data="asdf",
     )
 
-    url = "https://huggingface.co/api/models/{repo_id}/discussions"
+    url = f"https://huggingface.co/api/models/{repo_id}/discussions"
     r = requests.get(url)
     data = r.json()
     assert data["count"] == 0
