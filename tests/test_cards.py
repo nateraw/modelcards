@@ -51,7 +51,6 @@ def test_change_repocard_data():
 
 
 def test_model_card_from_default_template():
-
     card = ModelCard.from_template(
         card_data=CardData(
             language="en",
@@ -123,7 +122,9 @@ def test_model_card_without_metadata(caplog):
 
 
 def test_model_card_with_invalid_model_index(caplog):
-    """Test that when loading a card that has invalid model-index, no eval_results are added + it logs a warning"""
+    """
+    Test that when loading a card that has invalid model-index, no eval_results are added + it logs a warning
+    """
     sample_path = Path(__file__).parent / "samples" / "sample_invalid_model_index.md"
     with caplog.at_level(logging.WARNING):
         card = ModelCard.load(sample_path)
