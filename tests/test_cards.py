@@ -137,9 +137,7 @@ def test_validate_modelcard(caplog):
     card.validate()
 
     card.data.license = "asdf"
-    with pytest.raises(
-        RuntimeError, match='- Error: YAML metadata schema issue on key "license"'
-    ):
+    with pytest.raises(RuntimeError, match='- Error: "license" must be one of'):
         card.validate()
 
 
