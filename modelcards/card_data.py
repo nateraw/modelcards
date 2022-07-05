@@ -7,7 +7,9 @@ import yaml
 
 @dataclass
 class EvalResult:
-    """Flattened representation of individual evaluation results found in model-index."""
+    """
+    Flattened representation of individual evaluation results found in model-index.
+    """
 
     # Required
 
@@ -266,7 +268,9 @@ def model_index_to_eval_results(model_index: List[Dict[str, Any]]):
 
 
 def _remove_none(obj):
-    """Recursively remove `None` values from a dict. Borrowed from: https://stackoverflow.com/a/20558778"""
+    """
+    Recursively remove `None` values from a dict. Borrowed from: https://stackoverflow.com/a/20558778
+    """
     if isinstance(obj, (list, tuple, set)):
         return type(obj)(_remove_none(x) for x in obj if x is not None)
     elif isinstance(obj, dict):
