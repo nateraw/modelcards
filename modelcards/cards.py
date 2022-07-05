@@ -133,7 +133,7 @@ class RepoCard:
 
         try:
             r = requests.post(
-                "https://huggingface.co/validate-yaml", body, headers=headers
+                "https://huggingface.co/api/validate-yaml", body, headers=headers
             )
             r.raise_for_status()
         except requests.exceptions.HTTPError as exc:
