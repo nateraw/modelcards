@@ -82,12 +82,18 @@ class RepoCard:
         filepath.write_text(str(self))
 
     @classmethod
-    def load(cls, repo_id_or_path: Union[str, Path]):
+    def load(cls, repo_id_or_path: Union[str, Path], repo_type=None, token=None):
         """Initialize a RepoCard from a Hugging Face Hub repo's README.md or a local filepath.
 
         Args:
             repo_id_or_path (Union[str, Path]):
                 The repo ID associated with a Hugging Face Hub repo or a local filepath.
+            repo_type (str, *optional*):
+                The type of Hugging Face repo to push to. Defaults to None, which will use
+                use "model". Other options are "dataset" and "space".
+            token (str, *optional*):
+                Authentication token, obtained with `huggingface_hub.HfApi.login` method. Will default to
+                the stored token.
 
         Returns:
             modelcards.RepoCard: The RepoCard (or subclass) initialized from the repo's
@@ -98,10 +104,13 @@ class RepoCard:
             >>> card = RepoCard.load("nateraw/food")
             >>> assert card.data.tags == ["generated_from_trainer", "image-classification", "pytorch"]
         """
+
         if Path(repo_id_or_path).exists():
             card_path = Path(repo_id_or_path)
         else:
-            card_path = hf_hub_download(repo_id_or_path, "README.md")
+            card_path = hf_hub_download(
+                repo_id_or_path, "README.md", repo_type=repo_type, use_auth_token=token
+            )
 
         return cls(Path(card_path).read_text())
 
@@ -149,6 +158,7 @@ class RepoCard:
         repo_type=None,
         commit_message=None,
         commit_description=None,
+        revision=None,
         create_pr=None,
     ):
         """Push a RepoCard to a Hugging Face Hub repo.
@@ -166,8 +176,13 @@ class RepoCard:
                 The summary / title / first line of the generated commit
             commit_description (str, *optional*)
                 The description of the generated commit
+            revision (str, *optional*):
+                The git revision to commit from. Defaults to the head of the
+                `"main"` branch.
             create_pr (bool, *optional*):
                 Whether or not to create a Pull Request with this commit. Defaults to `False`.
+        Returns:
+            `str`: URL of the commit which updated the card metadata.
         """
         repo_name = repo_id.split("/")[-1]
 
@@ -184,7 +199,7 @@ class RepoCard:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir) / "README.md"
             tmp_path.write_text(str(self))
-            upload_file(
+            url = upload_file(
                 path_or_fileobj=str(tmp_path),
                 path_in_repo="README.md",
                 repo_id=repo_id,
@@ -194,7 +209,9 @@ class RepoCard:
                 commit_message=commit_message,
                 commit_description=commit_description,
                 create_pr=create_pr,
+                revision=revision,
             )
+        return url
 
 
 class ModelCard(RepoCard):
