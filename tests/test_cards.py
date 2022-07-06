@@ -63,7 +63,7 @@ def test_model_card_from_default_template():
         model_id=None,
     )
     assert card.text.strip().startswith(
-        "# MyModelName"
+        "# Model Card for Model ID"
     ), "Default model name not set correctly"
 
 
@@ -80,7 +80,7 @@ def test_model_card_from_default_template_with_model_id():
         model_id="my-cool-model",
     )
     assert card.text.strip().startswith(
-        "# my-cool-model"
+        "# Model Card for my-cool-model"
     ), "model_id not properly set in card template"
 
 
