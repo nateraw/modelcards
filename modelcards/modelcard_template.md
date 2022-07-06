@@ -30,14 +30,14 @@
 
 <!--> Provide a longer summary of what this model is. <!-->
 
-- **Developed by:** {{ developers | default("More information needed", true)}}
-- **Shared by [Optional]:** {{ shared_by | default("More information needed", true)}}
+- **Developed by:** {{ developers | default("[More Information Needed]", true)}}
+- **Shared by [Optional]:** {{ shared_by | default("[More Information Needed]", true)}}
 - **Model type:** Language model
-- **Language(s) (NLP):** {{ language | default("More information needed", true)}}
-- **License:** {{ license | default("More information needed", true)}}
-- **Related Models:** {{ related_models | default("More information needed", true)}}
-    - **Parent Model:** {{ parent_model | default("More information needed", true)}}
-- **Resources for more information:** {{ more_resources | default("More information needed", true)}}
+- **Language(s) (NLP):** {{ language | default("[More Information Needed]", true)}}
+- **License:** {{ license | default("[More Information Needed]", true)}}
+- **Related Models:** {{ related_models | default("[More Information Needed]", true)}}
+    - **Parent Model:** {{ parent_model | default("[More Information Needed]", true)}}
+- **Resources for more information:** {{ more_resources | default("[More Information Needed]", true)}}
 
 # Uses
 
@@ -47,25 +47,25 @@
 
 <!--> This section is for the model use without fine-tuning or plugging into a larger ecosystem/app. <!-->
 
-{{ direct_use | default("More information needed", true)}}
+{{ direct_use | default("[More Information Needed]", true)}}
 
 ## Downstream Use [Optional]
 
 <!--> This section is for the model use when fine-tuned for a task, or when plugged into a larger ecosystem/app <!-->
 
-{{ downstream_use | default("More information needed", true)}}
+{{ downstream_use | default("[More Information Needed]", true)}}
 
 ## Out-of-Scope Use
 
 <!--> This section addresses misuse, malicious use, and uses that the model will not work well for. <!-->
 
-{{ out_of_scope_use | default("More information needed", true)}}
+{{ out_of_scope_use | default("[More Information Needed]", true)}}
 
 # Bias, Risks, and Limitations
 
 <!--> This section is meant to convey both technical and sociotechnical limitations. <!-->
 
-{{ bias_risks_limitations | default("More information needed", true)}}
+{{ bias_risks_limitations | default("[More Information Needed]", true)}}
 
 ## Recommendations
 
@@ -79,7 +79,7 @@
 
 <!--> This should link to a Data Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. <!-->
 
-{{ training_data | default("More information needed", true)}}
+{{ training_data | default("[More Information Needed]", true)}}
 
 ## Training Procedure
 
@@ -87,13 +87,13 @@
 
 ### Preprocessing
 
-{{ preprocessing | default("More information needed", true)}}
+{{ preprocessing | default("[More Information Needed]", true)}}
 
 ### Speeds, Sizes, Times
 
 <!--> This section provides information about throughput, start/end time, checkpoint size if relevant, etc. <!-->
 
-{{ speeds_sizes_times | default("More information needed", true)}}
+{{ speeds_sizes_times | default("[More Information Needed]", true)}}
 
 # Evaluation
 
@@ -105,27 +105,27 @@
 
 <!--> This should link to a Data Card if possible. <!-->
 
-{{ testing_data | default("More information needed", true)}}
+{{ testing_data | default("[More Information Needed]", true)}}
 
 ### Factors
 
 <!--> These are the things the evaluation is disaggregating by, e.g., subpopulations or domains. <!-->
 
-{{ testing_factors | default("More information needed", true)}}
+{{ testing_factors | default("[More Information Needed]", true)}}
 
 ### Metrics
 
 <!--> These are the evaluation metrics being used, ideally with a description of why. <!-->
 
-{{ testing_metrics | default("More information needed", true)}}
+{{ testing_metrics | default("[More Information Needed]", true)}}
 
 ## Results
 
-{{ results | default("More information needed", true)}}
+{{ results | default("[More Information Needed]", true)}}
 
 # Model Examination
 
-{{ model_examination | default("More information needed", true)}}
+{{ model_examination | default("[More Information Needed]", true)}}
 
 # Environmental Impact
 
@@ -133,29 +133,29 @@
 
 Carbon emissions can be estimated using the [Machine Learning Impact calculator](https://mlco2.github.io/impact#compute) presented in [Lacoste et al. (2019)](https://arxiv.org/abs/1910.09700).
 
-- **Hardware Type:** {{ hardware | default("More information needed", true)}}
-- **Hours used:** {{ hours_used | default("More information needed", true)}}
-- **Cloud Provider:** {{ cloud_provider | default("More information needed", true)}}
-- **Compute Region:** {{ cloud_region | default("More information needed", true)}}
-- **Carbon Emitted:** {{ co2_emitted | default("More information needed", true)}}
+- **Hardware Type:** {{ hardware | default("[More Information Needed]", true)}}
+- **Hours used:** {{ hours_used | default("[More Information Needed]", true)}}
+- **Cloud Provider:** {{ cloud_provider | default("[More Information Needed]", true)}}
+- **Compute Region:** {{ cloud_region | default("[More Information Needed]", true)}}
+- **Carbon Emitted:** {{ co2_emitted | default("[More Information Needed]", true)}}
 
 # Technical Specifications [optional]
 
 ## Model Architecture and Objective
 
-{{ model_specs | default("More information needed", true)}}
+{{ model_specs | default("[More Information Needed]", true)}}
 
 ## Compute Infrastructure
 
-{{ compute_infrastructure | default("More information needed", true)}}
+{{ compute_infrastructure | default("[More Information Needed]", true)}}
 
 ### Hardware
 
-{{ hardware | default("More information needed", true)}}
+{{ hardware | default("[More Information Needed]", true)}}
 
 ### Software
 
-{{ software | default("More information needed", true)}}
+{{ software | default("[More Information Needed]", true)}}
 
 # Citation
 
@@ -163,29 +163,29 @@ Carbon emissions can be estimated using the [Machine Learning Impact calculator]
 
 **BibTeX:**
 
-{{ citation_bibtex | default("More information needed", true)}}
+{{ citation_bibtex | default("[More Information Needed]", true)}}
 
 **APA:**
 
-{{ citation_apa | default("More information needed", true)}}
+{{ citation_apa | default("[More Information Needed]", true)}}
 
 # Glossary [optional]
 
 <!--> If relevant, include terms and calculations in this section that can help readers understand the model or model card. <!-->
 
-{{ glossary | default("More information needed", true)}}
+{{ glossary | default("[More Information Needed]", true)}}
 
 # More Information [optional]
 
-{{ more_information | default("More information needed", true)}}
+{{ more_information | default("[More Information Needed]", true)}}
 
 # Model Card Authors [optional]
 
-{{ model_card_authors | default("More information needed", true)}}
+{{ model_card_authors | default("[More Information Needed]", true)}}
 
 # Model Card Contact
 
-{{ model_card_contact | default("More information needed", true)}}
+{{ model_card_contact | default("[More Information Needed]", true)}}
 
 # How to Get Started with the Model
 
@@ -194,6 +194,6 @@ Use the code below to get started with the model.
 <details>
 <summary> Click to expand </summary>
 
-{{ get_started_code | default("More information needed", true)}}
+{{ get_started_code | default("[More Information Needed]", true)}}
 
 </details>
