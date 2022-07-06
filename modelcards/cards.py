@@ -79,7 +79,7 @@ class RepoCard:
         """
         filepath = Path(filepath)
         filepath.parent.mkdir(parents=True, exist_ok=True)
-        filepath.write_text(str(self))
+        filepath.write_text(str(self), encoding="utf-8")
 
     @classmethod
     def load(cls, repo_id_or_path: Union[str, Path], repo_type=None, token=None):
@@ -112,7 +112,7 @@ class RepoCard:
                 repo_id_or_path, "README.md", repo_type=repo_type, use_auth_token=token
             )
 
-        return cls(Path(card_path).read_text())
+        return cls(Path(card_path).read_text(encoding="utf-8"))
 
     def validate(self, repo_type="model"):
         """Validates card against Hugging Face Hub's model card validation logic.
