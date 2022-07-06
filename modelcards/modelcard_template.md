@@ -30,6 +30,8 @@
 
 <!-- Provide a longer summary of what this model is. -->
 
+{{ model_description | default("", true) }}
+
 - **Developed by:** {{ developers | default("[More Information Needed]", true)}}
 - **Shared by [Optional]:** {{ shared_by | default("[More Information Needed]", true)}}
 - **Model type:** Language model
