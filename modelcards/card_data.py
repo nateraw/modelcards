@@ -91,32 +91,32 @@ class CardData:
         """Model Card Metadata that is used by Hugging Face Hub when included at the top of your README.md
 
         Args:
-            language (Union[str, List[str]], *optional*):
+            language (`Union[str, List[str]]`, *optional*):
                 Language of model's training data or metadata. Example: `'en'`. Defaults to `None`.
-            license (str, *optional*):
+            license (`str`, *optional*):
                 License of this model. Example: apache-2.0 or any license from
                 https://hf.co/docs/hub/model-repos#list-of-license-identifiers. Defaults to None.
-            library_name (str, *optional*):
+            library_name (`str`, *optional*):
                 Name of library used by this model. Example: keras or any library from
                 https://github.com/huggingface/hub-docs/blob/main/js/src/lib/interfaces/Libraries.ts.
                 Defaults to None.
-            tags (List[str], *optional*):
+            tags (`List[str]`, *optional*):
                 List of tags to add to your model that can be used when filtering on the Hugging
                 Face Hub. Defaults to None.
-            datasets (Union[str, List[str]], *optional*):
+            datasets (`Union[str, List[str]]`, *optional*):
                 Dataset or list of datasets that were used to train this model. Should be a dataset ID
                 found on https://hf.co/datasets. Defaults to None.
-            metrics (Union[str, List[str]], *optional*):
+            metrics (`Union[str, List[str]]`, *optional*):
                 List of metrics used to evaluate this model. Should be a metric name that can be found
                 at https://hf.co/metrics. Example: 'accuracy'. Defaults to None.
-            eval_results (Union[List[EvalResult], EvalResult], *optional*):
+            eval_results (`Union[List[EvalResult], EvalResult]`, *optional*):
                 List of `modelcards.EvalResult` that define evaluation results of the model. If provided,
                 `model_name` kwarg must be provided. Defaults to `None`.
-            model_name (str, *optional*):
+            model_name (`str`, *optional*):
                 A name for this model. Required if you provide `eval_results`. It is used along with
                 `eval_results` to construct the `model-index` within the card's metadata. The name
                 you supply here is what will be used on PapersWithCode's leaderboards. Defaults to None.
-            kwargs (dict, *optional*):
+            kwargs (`dict`, *optional*):
                 Additional metadata that will be added to the model card. Defaults to None.
 
         Example:
@@ -153,7 +153,7 @@ class CardData:
         be compatible with the model-index format.
 
         Returns:
-            dict: CardData represented as a dictionary ready to be dumped to a YAML
+            `dict`: CardData represented as a dictionary ready to be dumped to a YAML
             block for inclusion in a README.md file.
         """
 
@@ -181,15 +181,15 @@ def model_index_to_eval_results(model_index: List[Dict[str, Any]]):
     https://github.com/huggingface/hub-docs/blob/main/modelcard.md
 
     Args:
-        model_index (List[Dict[str, Any]]):
+        model_index (`List[Dict[str, Any]]`):
         A model index data structure, likely coming from a README.md file on the
         Hugging Face Hub.
 
     Returns:
-        - model_name (str):
+        - model_name (`str`):
             The name of the model as found in the model index. This is used as the
             identifier for the model on leaderboards like PapersWithCode.
-        - eval_results (List[EvalResult]):
+        - eval_results (`List[EvalResult]`):
             A list of `modelcards.EvalResult` objects containing the metrics
             reported in the provided model_index.
 
@@ -289,15 +289,15 @@ def eval_results_to_model_index(model_name: str, eval_results: List[EvalResult])
     Hugging Face Hub.
 
     Args:
-        model_name (str):
+        model_name (`str`):
             Name of the model (ex. "my-cool-model"). This is used as the identifier
             for the model on leaderboards like PapersWithCode.
-        eval_results (List[EvalResult]):
+        eval_results (`List[EvalResult]`):
             List of `modelcards.EvalResult` objects containing the metrics to be
             reported in the model-index.
 
     Returns:
-        model_index (List[Dict[str, Any]]): The eval_results converted to a model-index.
+        model_index (`List[Dict[str, Any]]`): The eval_results converted to a model-index.
 
     Example:
         >>> from modelcards.card_data import eval_results_to_model_index, EvalResult
