@@ -25,7 +25,7 @@ class RepoCard:
         Markdown file with a YAML block at the beginning and a Markdown body.
 
         Args:
-            content (str): The content of the Markdown file.
+            content (`str`): The content of the Markdown file.
 
         Raises:
             ValueError: When the content of the repo card metadata is not found.
@@ -70,7 +70,7 @@ class RepoCard:
         r"""Save a RepoCard to a file.
 
         Args:
-            filepath (Union[Path, str]): Filepath to the markdown file to save.
+            filepath (`Union[Path, str]`): Filepath to the markdown file to save.
 
         Example:
             >>> from modelcards import RepoCard
@@ -86,17 +86,17 @@ class RepoCard:
         """Initialize a RepoCard from a Hugging Face Hub repo's README.md or a local filepath.
 
         Args:
-            repo_id_or_path (Union[str, Path]):
+            repo_id_or_path (`Union[str, Path]`):
                 The repo ID associated with a Hugging Face Hub repo or a local filepath.
-            repo_type (str, *optional*):
+            repo_type (`str`, *optional*):
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
-            token (str, *optional*):
+            token (`str`, *optional*):
                 Authentication token, obtained with `huggingface_hub.HfApi.login` method. Will default to
                 the stored token.
 
         Returns:
-            modelcards.RepoCard: The RepoCard (or subclass) initialized from the repo's
+            `modelcards.RepoCard`: The RepoCard (or subclass) initialized from the repo's
                 README.md file or filepath.
 
         Example:
@@ -120,7 +120,7 @@ class RepoCard:
         internally by `modelcards.ModelCard.push_to_hub`.
 
         Args:
-            repo_type (str, *optional*):
+            repo_type (`str`, *optional*):
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
         """
@@ -164,22 +164,22 @@ class RepoCard:
         """Push a RepoCard to a Hugging Face Hub repo.
 
         Args:
-            repo_id (str):
+            repo_id (`str`):
                 The repo ID of the Hugging Face Hub repo to push to. Example: "nateraw/food".
-            token (str, *optional*):
+            token (`str`, *optional*):
                 Authentication token, obtained with `huggingface_hub.HfApi.login` method. Will default to
                 the stored token.
-            repo_type (str, *optional*):
+            repo_type (`str`, *optional*):
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
-            commit_message (str, *optional*):
+            commit_message (`str`, *optional*):
                 The summary / title / first line of the generated commit
-            commit_description (str, *optional*)
+            commit_description (`str`, *optional*)
                 The description of the generated commit
-            revision (str, *optional*):
+            revision (`str`, *optional*):
                 The git revision to commit from. Defaults to the head of the
                 `"main"` branch.
-            create_pr (bool, *optional*):
+            create_pr (`bool`, *optional*):
                 Whether or not to create a Pull Request with this commit. Defaults to `False`.
         Returns:
             `str`: URL of the commit which updated the card metadata.
@@ -227,16 +227,16 @@ class ModelCard(RepoCard):
         Templates are Jinja2 templates that can be customized by passing keyword arguments.
 
         Args:
-            card_data (modelcards.CardData, *required*):
+            card_data (`modelcards.CardData`):
                 A modelcards.CardData instance containing the metadata you want to include in the YAML
                 header of the model card on the Hugging Face Hub.
-            template_path (str, *optional*):
+            template_path (`str`, *optional*):
                 A path to a markdown file with optional Jinja template variables that can be filled
                 in with `template_kwargs`. Defaults to the default template which can be found here:
                 https://github.com/nateraw/modelcards/blob/main/modelcards/modelcard_template.md
 
         Returns:
-            modelcards.ModelCard: A ModelCard instance with the specified card data and content from the
+            `modelcards.ModelCard`: A ModelCard instance with the specified card data and content from the
             template.
 
         Example:
