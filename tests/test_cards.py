@@ -7,7 +7,7 @@ import pytest
 import requests
 from huggingface_hub import create_repo, delete_repo
 
-from modelcards import CardData, ModelCard, RepoCard
+from modelcards import ModelCard, ModelCardData
 
 from .hub_fixtures import HF_TOKEN, HF_USERNAME
 
@@ -21,9 +21,9 @@ def repo_id(request):
     delete_repo(repo_id, token=HF_TOKEN)
 
 
-def test_load_repocard_from_file():
+def test_load_modelcard_from_file():
     sample_path = Path(__file__).parent / "samples" / "sample_simple.md"
-    card = RepoCard.load(sample_path)
+    card = ModelCard.load(sample_path)
     assert card.data.to_dict() == {
         "language": ["en"],
         "license": "mit",
@@ -37,22 +37,22 @@ def test_load_repocard_from_file():
     ), "Card text not loaded properly"
 
 
-def test_change_repocard_data():
+def test_change_modelcard_data():
     sample_path = Path(__file__).parent / "samples" / "sample_simple.md"
-    card = RepoCard.load(sample_path)
+    card = ModelCard.load(sample_path)
     card.data.language = ["fr"]
 
     with tempfile.TemporaryDirectory() as tempdir:
         updated_card_path = Path(tempdir) / "updated.md"
         card.save(updated_card_path)
 
-        updated_card = RepoCard.load(updated_card_path)
+        updated_card = ModelCard.load(updated_card_path)
         assert updated_card.data.language == ["fr"], "Card data not updated properly"
 
 
 def test_model_card_from_default_template():
     card = ModelCard.from_template(
-        card_data=CardData(
+        card_data=ModelCardData(
             language="en",
             license="mit",
             library_name="pytorch",
@@ -69,7 +69,7 @@ def test_model_card_from_default_template():
 
 def test_model_card_from_default_template_with_model_id():
     card = ModelCard.from_template(
-        card_data=CardData(
+        card_data=ModelCardData(
             language="en",
             license="mit",
             library_name="pytorch",
@@ -87,7 +87,7 @@ def test_model_card_from_default_template_with_model_id():
 def test_model_card_from_custom_template():
     template_path = Path(__file__).parent / "samples" / "sample_template.md"
     card = ModelCard.from_template(
-        card_data=CardData(
+        card_data=ModelCardData(
             language="en",
             license="mit",
             library_name="pytorch",
@@ -114,11 +114,8 @@ def test_model_card_without_metadata(caplog):
     sample_path = Path(__file__).parent / "samples" / "sample_no_metadata.md"
     with caplog.at_level(logging.WARNING):
         card = ModelCard.load(sample_path)
-    assert (
-        "Repo card metadata block was not found. Setting CardData to empty."
-        in caplog.text
-    )
-    assert card.data == CardData()
+    assert "Repo card metadata block was not found." in caplog.text
+    assert card.data == ModelCardData()
 
 
 def test_model_card_with_invalid_model_index(caplog):
@@ -128,13 +125,16 @@ def test_model_card_with_invalid_model_index(caplog):
     sample_path = Path(__file__).parent / "samples" / "sample_invalid_model_index.md"
     with caplog.at_level(logging.WARNING):
         card = ModelCard.load(sample_path)
-    assert "Invalid model-index. Not loading eval results into CardData." in caplog.text
+    assert (
+        "Invalid model-index. Not loading eval results into ModelCardData."
+        in caplog.text
+    )
     assert card.data.eval_results is None
 
 
 def test_validate_modelcard(caplog):
     sample_path = Path(__file__).parent / "samples" / "sample_simple.md"
-    card = RepoCard.load(sample_path)
+    card = ModelCard.load(sample_path)
     card.validate()
 
     card.data.license = "asdf"
@@ -145,7 +145,7 @@ def test_validate_modelcard(caplog):
 def test_push_to_hub(repo_id):
     template_path = Path(__file__).parent / "samples" / "sample_template.md"
     card = ModelCard.from_template(
-        card_data=CardData(
+        card_data=ModelCardData(
             language="en",
             license="mit",
             library_name="pytorch",
@@ -175,7 +175,7 @@ def test_push_to_hub(repo_id):
 def test_push_and_create_pr(repo_id):
     template_path = Path(__file__).parent / "samples" / "sample_template.md"
     card = ModelCard.from_template(
-        card_data=CardData(
+        card_data=ModelCardData(
             language="en",
             license="mit",
             library_name="pytorch",
