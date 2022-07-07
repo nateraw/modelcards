@@ -4,8 +4,8 @@ import pytest
 
 from modelcards import ModelCard
 from modelcards.card_data import (
-    CardData,
     EvalResult,
+    ModelCardData,
     eval_results_to_model_index,
     model_index_to_eval_results,
 )
@@ -87,7 +87,7 @@ def test_card_data_requires_model_name_for_eval_results():
     with pytest.raises(
         ValueError, match="`eval_results` requires `model_name` to be set."
     ):
-        CardData(
+        ModelCardData(
             eval_results=[
                 EvalResult(
                     task_type="image-classification",
@@ -99,7 +99,7 @@ def test_card_data_requires_model_name_for_eval_results():
             ],
         )
 
-    data = CardData(
+    data = ModelCardData(
         model_name="my-cool-model",
         eval_results=[
             EvalResult(
@@ -119,7 +119,7 @@ def test_card_data_requires_model_name_for_eval_results():
 
 
 def test_abitrary_incoming_card_data():
-    data = CardData(
+    data = ModelCardData(
         model_name="my-cool-model",
         eval_results=[
             EvalResult(
