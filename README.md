@@ -100,3 +100,39 @@ card = ModelCard.from_template(
     dataset_name='awesome-dataset', # Jinja template kwarg
 )
 ```
+
+### Example of how to use the NLP Model Card Template with Auto-Generation of some of the model card content
+
+```python
+# Set the metadata that will go at the top of the card
+card_data = CardData(
+    license='mit',
+    language=['en', 'fr', 'multilingual'],
+    )
+
+# Model card for a text generation model
+card1 = ModelCard.from_template(
+    card_data, 
+    template_path='NLP_modelcard_new_spec.md', 
+    model_id=repo_id.split('/')[-1], 
+    model_task="text_generation", 
+    authors=['person1', 'person2', 'person3'],
+    model_summary="This is a placeholder summary.",
+    related_models=['fake_model1', 'fake_model2'],
+    blog_link="https://huggingface.co", 
+    paper_link="https://huggingface.co",
+    model_card_user="policymaker")
+
+# Model card with no task specified, where direct use and downstream use are specified
+card2 = ModelCard.from_template(
+    card_data, 
+    template_path='NLP_modelcard_new_spec.md', 
+    model_id=repo_id.split('/')[-1], 
+    authors=['person1', 'person2', 'person3'],
+    model_summary="This is a placeholder summary.",
+    related_models=['fake_model1', 'fake_model2'],
+    blog_link="https://huggingface.co", 
+    paper_link="https://huggingface.co",
+    direct_use="This model can be used to do some sort of task.",
+    downstream_use="This model can be used downstream as part of some system.")
+```
