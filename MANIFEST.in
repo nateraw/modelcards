@@ -1,5 +1,25 @@
-include modelcards/modelcard_template.md
+# explicitly include or exclude files and folders 
+# for complete control of what is packaged
 
-README.md
-LICENSE
-MANIFEST.in
+# INCLUDE
+
+include README.md
+include LICENSE
+include MANIFEST.in
+include requirements.txt
+include pyproject.toml
+include setup.cfg
+include setup.py
+
+recursive-include modelcards
+include modelcards/modelcard_template.md
+include modelcards_demo.ipynb
+
+# EXCLUDE
+
+exclude .pre-commit-config.yaml
+exclude .gitignore
+
+recursive-exclude tests
+recursive-exclude .github
+recursive-exclude dist
