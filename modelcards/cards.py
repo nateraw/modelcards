@@ -9,17 +9,82 @@ import yaml
 from huggingface_hub import hf_hub_download, upload_file
 from huggingface_hub.utils.logging import get_logger
 
-from .card_data import CardData, model_index_to_eval_results
+from .card_data import DatasetCardData, ModelCardData
 
 TEMPLATE_MODELCARD_PATH = Path(__file__).parent / "modelcard_template.md"
-REGEX_YAML_BLOCK = re.compile(
-    r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]([\S\s].*)", re.DOTALL
-)
+REGEX_YAML_BLOCK = re.compile(r"---[\n\r]+([\S\s]*?)[\n\r]+---[\n\r]")
+
 
 logger = get_logger(__name__)
 
 
+def parse_repocard_content(content, return_text=False):
+    """Parse repocard metadata dict and (optionally) the accompanying
+    card content from a string.
+
+    Args:
+        content (_type_): _description_
+        return_text (bool, optional): _description_. Defaults to False.
+
+    Raises:
+        ValueError: When the repocard metadata is found but is not a dict
+
+    Returns:
+        If `return_text` is False:
+
+        `dict`: the metadata dict loaded from YAML header.
+
+        If `return_text` is True:
+
+        (`dict`, `str): Both the metadata dict and card text content.
+
+    Example:
+        >>> from modelcards.cards import parse_repo_content
+
+        >>> # Some string content we want to parse
+        >>> content = '''
+        ... ---
+        ... language: en
+        ... license: mit
+        ... ---
+        ... # My Cool Card!
+        ... '''
+
+        >>> # Return just metadata dict
+        >>> metadata = parse_repocard_content(content)
+        >>> assert metadata == {'language': 'en', 'license': 'mit'}
+
+        >>> # Return both metadata dict and text
+        >>> metadata, text = parse_repocard_content(content, return_text=True)
+        >>> assert text == "# My Cool Card!"
+        >>> assert metadata == {'language': 'en', 'license': 'mit'}
+    """
+    match = REGEX_YAML_BLOCK.search(content)
+    if match:
+        # Metadata found in the YAML block
+        yaml_block = match.group(1)
+        text = content[match.end() :]
+        metadata = yaml.safe_load(yaml_block)
+
+        # The YAML block's data should be a dictionary
+        if not isinstance(metadata, dict):
+            raise ValueError("repo card metadata block should be a dict")
+    else:
+        # Model card without metadata... create empty metadata
+        logger.warning("Repo card metadata block was not found.")
+        metadata = {}
+        text = content
+
+    if return_text:
+        return metadata, text
+
+    return metadata
+
+
 class RepoCard:
+
+    repo_type: str
+
     def __init__(self, content: str):
         """Initialize a RepoCard from string content. The content should be a
         Markdown file with a YAML block at the beginning and a Markdown body.
@@ -32,36 +97,12 @@ class RepoCard:
             ValueError: When the content of the repo card metadata is not a dictionary.
         """
         self.content = content
-        match = REGEX_YAML_BLOCK.search(content)
-        if match:
-            # Metadata found in the YAML block
-            yaml_block = match.group(1)
-            self.text = match.group(2)
-            data_dict = yaml.safe_load(yaml_block)
-
-            # The YAML block's data should be a dictionary
-            if not isinstance(data_dict, dict):
-                raise ValueError("repo card metadata block should be a dict")
-        else:
-            # Model card without metadata... create empty metadata
-            logger.warning(
-                "Repo card metadata block was not found. Setting CardData to empty."
-            )
-            data_dict = {}
-            self.text = content
-
-        model_index = data_dict.pop("model-index", None)
-        if model_index:
-            try:
-                model_name, eval_results = model_index_to_eval_results(model_index)
-                data_dict["model_name"] = model_name
-                data_dict["eval_results"] = eval_results
-            except KeyError:
-                logger.warning(
-                    "Invalid model-index. Not loading eval results into CardData."
-                )
-
-        self.data = CardData(**data_dict)
+        metadata, self.text = parse_repocard_content(content, return_text=True)
+        self.data = (
+            ModelCardData(**metadata)
+            if self.repo_type == "model"
+            else DatasetCardData(**metadata)
+        )
 
     def __str__(self):
         return f"---\n{self.data.to_yaml()}\n---\n{self.text}"
@@ -124,8 +165,6 @@ class RepoCard:
                 The type of Hugging Face repo to push to. Defaults to None, which will use
                 use "model". Other options are "dataset" and "space".
         """
-        if repo_type is None:
-            repo_type = "model"
 
         # TODO - compare against repo types constant in huggingface_hub if we move this object there.
         if repo_type not in ["model", "space", "dataset"]:
@@ -155,7 +194,7 @@ class RepoCard:
         self,
         repo_id,
         token=None,
-        repo_type=None,
+        # repo_type=None,
         commit_message=None,
         commit_description=None,
         revision=None,
@@ -184,17 +223,18 @@ class RepoCard:
         Returns:
             `str`: URL of the commit which updated the card metadata.
         """
-        repo_name = repo_id.split("/")[-1]
+        # NOTE - removing this fo good soon
+        # repo_name = repo_id.split("/")[-1]
 
-        if self.data.model_name and self.data.model_name != repo_name:
-            logger.warning(
-                f"Set model name {self.data.model_name} in CardData does not match "
-                f"repo name {repo_name}. Updating model name to match repo name."
-            )
-            self.data.model_name = repo_name
+        # if self.data.model_name and self.data.model_name != repo_name:
+        #     logger.warning(
+        #         f"Set model name {self.data.model_name} in CardData does not match "
+        #         f"repo name {repo_name}. Updating model name to match repo name."
+        #     )
+        #     self.data.model_name = repo_name
 
         # Validate card before pushing to hub
-        self.validate(repo_type=repo_type)
+        self.validate(repo_type=self.repo_type)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir) / "README.md"
@@ -204,7 +244,7 @@ class RepoCard:
                 path_in_repo="README.md",
                 repo_id=repo_id,
                 token=token,
-                repo_type=repo_type,
+                repo_type=self.repo_type,
                 identical_ok=True,
                 commit_message=commit_message,
                 commit_description=commit_description,
@@ -213,12 +253,38 @@ class RepoCard:
             )
         return url
 
+    @classmethod
+    def from_template(cls, card_data, template_path, **template_kwargs):
+        """Initialize a RepoCard from a template.
+
+        Args:
+            card_data (`modelcards.CardData`):
+                The {Model|Dataset}CardData to use for the template.
+            template_path (`str`):
+                The path to the template file.
+            **template_kwargs (`dict`):
+                Keyword arguments to pass to the template.
+        Returns:
+            `modelcards.RepoCard`: The RepoCard initialized from the template.
+        """
+        template_path = Path(template_path)
+        if not template_path.exists():
+            raise RuntimeError(f"Template file {template_path} does not exist.")
+
+        content = jinja2.Template(Path(template_path).read_text()).render(
+            card_data=card_data.to_yaml(), **template_kwargs
+        )
+        return cls(content)
+
 
 class ModelCard(RepoCard):
+
+    repo_type = "model"
+
     @classmethod
     def from_template(
         cls,
-        card_data: CardData,
+        card_data: ModelCardData,
         template_path: Optional[str] = TEMPLATE_MODELCARD_PATH,
         **template_kwargs,
     ):
@@ -285,7 +351,9 @@ class ModelCard(RepoCard):
             ... )
 
         """
-        content = jinja2.Template(Path(template_path).read_text()).render(
-            card_data=card_data.to_yaml(), **template_kwargs
-        )
-        return cls(content)
+        return super().from_template(card_data, template_path, **template_kwargs)
+
+
+class DatasetCard(RepoCard):
+
+    repo_type = "dataset"

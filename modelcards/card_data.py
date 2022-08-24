@@ -3,6 +3,9 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
 import yaml
+from huggingface_hub.utils.logging import get_logger
+
+logger = get_logger(__file__)
 
 
 @dataclass
@@ -75,7 +78,7 @@ class EvalResult:
 
 
 @dataclass
-class CardData:
+class ModelCardData:
     def __init__(
         self,
         language: Optional[Union[str, List[str]]] = None,
@@ -131,15 +134,29 @@ class CardData:
             {'language': 'en', 'license': 'mit', 'library_name': 'timm', 'tags': ['image-classification', 'resnet']}
 
         """
-
         self.language = language
         self.license = license
         self.library_name = library_name
         self.tags = tags
         self.datasets = datasets
         self.metrics = metrics
-        self.eval_results = eval_results
-        self.model_name = model_name
+
+        model_index = kwargs.pop("model-index", None)
+        if model_index:
+            try:
+                self.model_name, self.eval_results = model_index_to_eval_results(
+                    model_index
+                )
+            except KeyError:
+                logger.warning(
+                    "Invalid model-index. Not loading eval results into ModelCardData."
+                )
+                self.eval_results = None
+                self.model_name = model_name
+        else:
+            self.eval_results = eval_results
+            self.model_name = model_name
+
         self.__dict__.update(kwargs)
 
         if self.eval_results:
@@ -164,6 +181,58 @@ class CardData:
             )
             del data_dict["eval_results"], data_dict["model_name"]
 
+        return _remove_none(data_dict)
+
+    def to_yaml(self):
+        """Dumps CardData to a YAML block for inclusion in a README.md file."""
+        return yaml.dump(self.to_dict(), sort_keys=False).strip()
+
+    def __repr__(self):
+        return self.to_yaml()
+
+
+@dataclass
+class DatasetCardData:
+    def __init__(
+        self,
+        annotations_creators,
+        language_creators,
+        language,
+        license,
+        multilinguality,
+        size_categories,
+        source_datasets,
+        task_categories,
+        task_ids,
+        paperswithcode_id,
+        pretty_name,
+        # train_eval_index,  # TODO: Deal with this
+        configs,
+        **kwargs,
+    ):
+        self.annotations_creators = annotations_creators
+        self.language_creators = language_creators
+        self.language = language
+        self.license = license
+        self.multilinguality = multilinguality
+        self.size_categories = size_categories
+        self.source_datasets = source_datasets
+        self.task_categories = task_categories
+        self.task_ids = task_ids
+        self.paperswithcode_id = paperswithcode_id
+        self.pretty_name = pretty_name
+        self.configs = configs
+        self.__dict__.update(kwargs)
+
+    def to_dict(self):
+        """Converts CardData to a dict. It also formats the internal eval_results to
+        be compatible with the model-index format.
+
+        Returns:
+            `dict`: CardData represented as a dictionary ready to be dumped to a YAML
+            block for inclusion in a README.md file.
+        """
+        data_dict = copy.deepcopy(self.__dict__)
         return _remove_none(data_dict)
 
     def to_yaml(self):
