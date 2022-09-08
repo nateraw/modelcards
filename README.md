@@ -1,5 +1,15 @@
 # modelcards
 
+## ⚠️Deprecation Warning⚠️ Utils in this repo now live in [`huggingface_hub`](https://github.com/huggingface/huggingface_hub).
+
+**So, this project will no longer be maintained.**
+
+You can find more information in the Hugging Face Hub documentation:
+- [Walkthrough Guide](https://huggingface.co/docs/huggingface_hub/main/en/how-to-model-cards)
+- [Repo Cards API Reference Documentation](https://huggingface.co/docs/huggingface_hub/main/en/package_reference/cards)
+
+---
+
 📝 Utility to create, edit, and publish model cards on the Hugging Face Hub.
 
 For a full walkthrough, try the demo in Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nateraw/modelcards/blob/main/modelcards_demo.ipynb)
