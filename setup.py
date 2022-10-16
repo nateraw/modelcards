@@ -24,6 +24,6 @@ setup(
     ),
     license="MIT",
     install_requires=requirements,
-    packages=find_packages(),
+    packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     include_package_data=True,
 )
